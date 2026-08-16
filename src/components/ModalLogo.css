@@ -1,0 +1,41 @@
+/* Modal Logo Styles */
+.modal-logo,
+.ghsnapflix-logo-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px auto;
+  width: 100%;
+  text-align: center;
+}
+
+.modal-logo .ghsnapflix-logo,
+.ghsnapflix-logo-container .ghsnapflix-logo {
+  margin: 0 auto;
+  display: block;
+  text-align: center;
+  width: 100%;
+  max-width: 200px;
+}
+
+.modal-logo .logo-container,
+.ghsnapflix-logo-container .logo-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin: 0 auto;
+}
+
+/* Ensure logo is centered */
+.modal-logo .play-button-icon,
+.ghsnapflix-logo-container .play-button-icon {
+  margin: 0 auto;
+}
+
+.modal-logo .logo-text,
+.ghsnapflix-logo-container .logo-text {
+  margin: 0 auto;
+}
+

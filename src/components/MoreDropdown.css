@@ -1,0 +1,127 @@
+.more-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.more-button {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.more-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.dropdown-arrow {
+  font-size: 10px;
+  transition: transform 0.3s ease;
+}
+
+.more-dropdown:hover .dropdown-arrow {
+  transform: rotate(180deg);
+}
+
+.more-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: #2d2d2d;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  padding: 0;
+  min-width: 200px;
+  z-index: 1001;
+  margin-top: 5px;
+  border: 1px solid #444;
+  overflow: hidden;
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.menu-header {
+  background-color: #1a1a1a;
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 12px 16px;
+  border-bottom: 1px solid #444;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.menu-categories {
+  padding: 8px 0;
+}
+
+.category-item {
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 10px 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-left: 3px solid transparent;
+}
+
+.category-item:hover {
+  background-color: rgba(13, 148, 136, 0.1);
+  border-left-color: #0d9488;
+  color: #0d9488;
+}
+
+.category-item:active {
+  background-color: rgba(13, 148, 136, 0.2);
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .more-menu {
+    min-width: 180px;
+  }
+  
+  .category-item {
+    font-size: 13px;
+    padding: 8px 14px;
+  }
+  
+  .menu-header {
+    font-size: 11px;
+    padding: 10px 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .more-menu {
+    min-width: 160px;
+  }
+  
+  .category-item {
+    font-size: 12px;
+    padding: 6px 12px;
+  }
+  
+  .menu-header {
+    font-size: 10px;
+    padding: 8px 12px;
+  }
+}

@@ -1,0 +1,263 @@
+.ghsnapflix-logo {
+  display: block;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  visibility: visible !important;
+  opacity: 1 !important;
+  position: relative;
+  z-index: 100;
+  margin: 0 auto;
+  text-align: center;
+  width: 100%;
+  left: 0;
+  transform: none;
+}
+
+.ghsnapflix-logo:hover {
+  transform: scale(1.05);
+}
+
+/* Modern Play Icon Styles */
+.modern-play-icon {
+  position: relative;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.play-svg {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 2px 8px rgba(255, 246, 194, 0.35)) drop-shadow(0 8px 22px rgba(45, 212, 191, 0.45));
+  transition: all 0.3s ease;
+}
+
+.ghsnapflix-logo.animated .play-svg {
+  animation: pulseGlow 2s ease-in-out infinite;
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    filter: drop-shadow(0 2px 8px rgba(255, 246, 194, 0.3)) drop-shadow(0 8px 18px rgba(45, 212, 191, 0.4));
+    transform: scale(1);
+  }
+  50% {
+    filter: drop-shadow(0 4px 14px rgba(255, 246, 194, 0.55)) drop-shadow(0 10px 28px rgba(45, 212, 191, 0.65));
+    transform: scale(1.04);
+  }
+}
+
+.play-circle {
+  transition: all 0.3s ease;
+}
+
+.play-triangle {
+  transition: all 0.3s ease;
+}
+
+.play-ring {
+  transition: all 0.3s ease;
+}
+
+.ghsnapflix-logo.animated .play-ring {
+  animation: ringPulse 2s ease-in-out infinite;
+}
+
+@keyframes ringPulse {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.1);
+  }
+}
+
+/* Disable animations on mobile for performance */
+@media (max-width: 768px) {
+  .ghsnapflix-logo.animated .play-svg {
+    animation: none !important;
+    filter: drop-shadow(0 2px 8px rgba(45, 212, 191, 0.35)) !important;
+  }
+  
+  .ghsnapflix-logo.animated .play-ring {
+    animation: none !important;
+  }
+}
+
+.logo-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  visibility: visible !important;
+  opacity: 1 !important;
+  margin: 0 auto;
+  text-align: center;
+  width: 100%;
+}
+
+/* Logo Text */
+.logo-text {
+  display: flex;
+  font-family: 'Arial Black', Arial, sans-serif;
+  font-weight: 900;
+  letter-spacing: 1px;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+.text-snap {
+  font-size: 26px;
+  font-weight: 900;
+  background: linear-gradient(180deg, #ecfdf9 0%, #5eead4 48%, #14b8a6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: 2px;
+  margin-right: 2px;
+  display: inline-block;
+  position: relative;
+  filter: drop-shadow(0 0 10px rgba(94, 234, 212, 0.35));
+}
+
+.text-flix {
+  font-size: 26px;
+  font-weight: 900;
+  background: linear-gradient(180deg, #fff7cc 0%, #fde68a 45%, #facc15 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: 2px;
+  display: inline-block;
+  position: relative;
+  filter: drop-shadow(0 0 10px rgba(250, 204, 21, 0.35));
+}
+
+/* Size Variations */
+.ghsnapflix-logo.small .modern-play-icon {
+  width: 40px;
+  height: 40px;
+}
+
+.ghsnapflix-logo.small .logo-text {
+  font-size: 20px;
+}
+
+.ghsnapflix-logo.small .text-snap,
+.ghsnapflix-logo.small .text-flix {
+  font-size: 20px;
+}
+
+.ghsnapflix-logo.medium .modern-play-icon {
+  width: 50px;
+  height: 50px;
+}
+
+.ghsnapflix-logo.medium .logo-text {
+  font-size: 26px;
+}
+
+.ghsnapflix-logo.medium .text-snap,
+.ghsnapflix-logo.medium .text-flix {
+  font-size: 26px;
+}
+
+.ghsnapflix-logo.large .modern-play-icon {
+  width: 65px;
+  height: 65px;
+}
+
+.ghsnapflix-logo.large .logo-text {
+  font-size: 34px;
+}
+
+.ghsnapflix-logo.large .text-snap,
+.ghsnapflix-logo.large .text-flix {
+  font-size: 34px;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .ghsnapflix-logo.medium .modern-play-icon {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .ghsnapflix-logo.medium .logo-text {
+    font-size: 22px;
+  }
+
+  .ghsnapflix-logo.medium .text-snap,
+  .ghsnapflix-logo.medium .text-flix {
+    font-size: 22px;
+  }
+  
+  .ghsnapflix-logo.medium .logo-container {
+    gap: 12px;
+  }
+
+  .ghsnapflix-logo.small .modern-play-icon {
+    width: 35px;
+    height: 35px;
+  }
+
+  .ghsnapflix-logo.small .text-snap,
+  .ghsnapflix-logo.small .text-flix {
+    font-size: 18px;
+  }
+
+  .ghsnapflix-logo.large .modern-play-icon {
+    width: 55px;
+    height: 55px;
+  }
+
+  .ghsnapflix-logo.large .text-snap,
+  .ghsnapflix-logo.large .text-flix {
+    font-size: 28px;
+  }
+}
+
+@media (max-width: 480px) {
+  .ghsnapflix-logo.medium .modern-play-icon {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .ghsnapflix-logo.medium .logo-text {
+    font-size: 20px;
+  }
+
+  .ghsnapflix-logo.medium .text-snap,
+  .ghsnapflix-logo.medium .text-flix {
+    font-size: 20px;
+  }
+  
+  .ghsnapflix-logo.medium .logo-container {
+    gap: 10px;
+  }
+
+  .ghsnapflix-logo.small .modern-play-icon {
+    width: 32px;
+    height: 32px;
+  }
+
+  .ghsnapflix-logo.small .text-snap,
+  .ghsnapflix-logo.small .text-flix {
+    font-size: 16px;
+  }
+
+  .ghsnapflix-logo.large .modern-play-icon {
+    width: 48px;
+    height: 48px;
+  }
+
+  .ghsnapflix-logo.large .text-snap,
+  .ghsnapflix-logo.large .text-flix {
+    font-size: 24px;
+  }
+}
