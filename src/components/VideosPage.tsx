@@ -27,7 +27,7 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, onCardClick }) => {
   
   // Get video URL
   const videoUrl = video.video;
-  const { containerRef, videoRef, hasFrame } = useCardVideoPreview(videoUrl, isHovered && showVideo);
+  const { containerRef, videoRef } = useCardVideoPreview(videoUrl, isHovered && showVideo);
 
   const playVideo = () => {
     setShowVideo(true);
@@ -91,36 +91,15 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, onCardClick }) => {
       <div className="video-wrapper" ref={containerRef}>
         <video
           ref={videoRef}
-          className={`video-preview ${hasFrame || showVideo ? 'playing' : ''}`}
+          className="video-preview playing"
           muted
           playsInline
           loop
-          preload="metadata"
+          preload="auto"
           onError={() => {
             console.error('Video load error:', videoUrl);
           }}
         />
-        {!hasFrame && !showVideo && (
-          <div
-            className="video-thumbnail video-thumbnail-placeholder"
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: '100%',
-              height: '100%',
-              background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              zIndex: 4
-            }}
-          >
-            <div style={{ textAlign: 'center', color: '#fff' }}>
-              <div style={{ fontSize: '14px', fontWeight: 600, opacity: 0.9 }}>{video.title}</div>
-            </div>
-          </div>
-        )}
         <div className="video-badge">{video.category.toUpperCase()}</div>
       </div>
       <div className="video-details">

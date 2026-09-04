@@ -31,7 +31,7 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, onVideoPlay, onFavorite, i
   
   // Get video URL
   const videoUrl = video.video;
-  const { containerRef, videoRef, hasFrame } = useCardVideoPreview(videoUrl, isHovered && showVideo);
+  const { containerRef, videoRef } = useCardVideoPreview(videoUrl, isHovered && showVideo);
 
   const handleFavoriteClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -102,36 +102,15 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, onVideoPlay, onFavorite, i
       <div className="video-image-container" ref={containerRef}>
         <video
           ref={videoRef}
-          className={`video-element ${hasFrame || showVideo ? 'visible' : ''}`}
+          className="video-element visible"
           muted
           playsInline
           loop
-          preload="metadata"
+          preload="auto"
           onError={() => {
             console.error('Video load error:', videoUrl);
           }}
         />
-        {!hasFrame && !showVideo && (
-          <div
-            className="video-image video-image-placeholder"
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: '100%',
-              height: '100%',
-              background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              zIndex: 4
-            }}
-          >
-            <div style={{ textAlign: 'center', color: '#fff' }}>
-              <div style={{ fontSize: '14px', fontWeight: 600, opacity: 0.9 }}>{video.name}</div>
-            </div>
-          </div>
-        )}
         <div className="video-overlay video-active">
           <div className="video-preview-badge">
             <span className="preview-dot"></span>

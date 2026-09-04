@@ -45,6 +45,7 @@ import {
 } from './utils/sessionStorage';
 import { fetchSubscriptionStatus } from './services/subscriptionService';
 import { PlayableVideo } from './types/video';
+import { resolveCgwCallbackNotice } from './utils/cgwStatus';
 import LoadingSpinner from './components/LoadingSpinner';
 
 type Page = 'home' | 'rewards' | 'profile' | 'subscription' | 'news' | 'unsubscribe' | 'subscription-management' | 'videos' | 'favorites' | 'explore' | 'faq' | 'about';
@@ -86,21 +87,13 @@ function AppContent() {
 
     const handleActivationCallback = async () => {
       const token = params.get('token');
-      const status = (params.get('status') || '').toLowerCase();
-      const reason =
-        params.get('reason') ||
-        params.get('message') ||
-        'We could not complete your subscription.';
+      const notice = resolveCgwCallbackNotice(params);
       const offerCode =
         params.get('offerCode') || localStorage.getItem('offerCode') || INITIAL_OFFER_CODE;
       const msisdn = normalizeGhanaMsisdn(
         params.get('msisdn') || localStorage.getItem('phone') || ''
       );
-      const isSuccess =
-        status === 'success' ||
-        status === 'successful' ||
-        params.get('success') === 'true' ||
-        params.get('subscribed') === 'true';
+      const isSuccess = notice.success && Boolean(token);
 
       window.history.replaceState({}, '', '/');
 
@@ -117,8 +110,11 @@ function AppContent() {
         applySession(true);
         setCurrentPage('home');
         setNotification({
-          message: NOTIFICATION_MESSAGES.OTP_VERIFIED_SUCCESS,
-          type: 'success',
+          message:
+            notice.message === 'Success'
+              ? NOTIFICATION_MESSAGES.OTP_VERIFIED_SUCCESS
+              : notice.message,
+          type: notice.type === 'info' ? 'info' : 'success',
         });
         setIsHandlingCallback(false);
         return;
@@ -128,8 +124,8 @@ function AppContent() {
       applySession(false);
       setShowLoginModal(true);
       setNotification({
-        message: reason,
-        type: 'error',
+        message: notice.message,
+        type: notice.type,
       });
       setIsHandlingCallback(false);
     };

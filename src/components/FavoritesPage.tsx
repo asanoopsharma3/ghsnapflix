@@ -19,7 +19,7 @@ interface FavoritePageCardProps {
 const FavoritePageCard: React.FC<FavoritePageCardProps> = ({ video, onVideoPlay, onRemove }) => {
   const [showVideo, setShowVideo] = useState(false);
   const videoUrl = video.video;
-  const { containerRef, videoRef, hasFrame } = useCardVideoPreview(videoUrl, showVideo);
+  const { containerRef, videoRef } = useCardVideoPreview(videoUrl, showVideo);
 
   const handleClick = () => {
     onVideoPlay?.({
@@ -39,27 +39,15 @@ const FavoritePageCard: React.FC<FavoritePageCardProps> = ({ video, onVideoPlay,
       <div className="favorite-video-container-page" ref={containerRef}>
         <video
           ref={videoRef}
-          className={`favorite-video-element-page ${hasFrame || showVideo ? 'favorite-video-page-visible' : ''}`}
+          className="favorite-video-element-page favorite-video-page-visible"
           muted
           playsInline
           loop
-          preload="metadata"
+          preload="auto"
           onError={() => {
             console.error('Favorite page video load error:', videoUrl);
           }}
         />
-        {!hasFrame && !showVideo && (
-            <div className="favorite-thumbnail favorite-thumbnail-placeholder" style={{ 
-              background: 'linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%)',
-              display: 'flex', 
-              alignItems: 'center', 
-              justifyContent: 'center',
-              color: '#999',
-              zIndex: 4
-            }}>
-              <span>{video.name}</span>
-            </div>
-        )}
         <button
           className="remove-favorite-btn"
           onClick={(e) => {
