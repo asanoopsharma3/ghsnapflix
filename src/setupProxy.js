@@ -6,10 +6,8 @@ const {
 } = require('./config/app.config.js');
 
 /**
- * Dev proxy — only active when APP_ENV !== 'production' in app.config.js
- * Browser → localhost/snapflix_backend/* → apiunisol.com/snapflix_backend/*
- *
- * Restart `npm start` after changing app.config.js
+ * Dev proxy — only if API_BACKEND_PATH is set in app.config.js
+ * Restart `npm start` after changing .env files
  */
 module.exports = function setupProxy(app) {
   if (!useProxy) {
