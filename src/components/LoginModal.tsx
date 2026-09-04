@@ -9,11 +9,9 @@ import {
   PHONE_INPUT_MAX_LENGTH,
   sanitizeLocalPhoneInput,
 } from '../constants/phone';
-import { sendOtp } from '../services/authService';
-import { SendOtpResponse } from '../types/auth';
 
 interface LoginModalProps {
-  onSubmit: (msisdn: string, otpResponse: SendOtpResponse) => void;
+  onSubmit: (msisdn: string) => void | Promise<void>;
   onNotify: (message: string, type: NotificationType) => void;
   onClose: () => void;
 }
@@ -38,13 +36,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ onSubmit, onNotify, onClose }) 
     setIsLoading(true);
 
     try {
-      const response = await sendOtp(msisdn);
-
-      if (response.ok) {
-        onSubmit(msisdn, response);
-      } else {
-        onNotify(NOTIFICATION_MESSAGES.ERROR_GENERIC, 'error');
-      }
+      await onSubmit(msisdn);
     } catch {
       onNotify(NOTIFICATION_MESSAGES.ERROR_GENERIC, 'error');
     } finally {
@@ -124,11 +116,11 @@ const LoginModal: React.FC<LoginModalProps> = ({ onSubmit, onNotify, onClose }) 
             {isLoading ? (
               <>
                 <span className="button-spinner" aria-hidden="true" />
-                <span>Sending OTP...</span>
+                <span>Please wait...</span>
               </>
             ) : (
               <>
-                <span>{t('login.send.otp')}</span>
+                <span>{t('login.proceed.subscribe')}</span>
                 <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
                   <path d="M4 10L16 10M10 4L16 10L10 16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>

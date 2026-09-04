@@ -1,7 +1,12 @@
 import { SubscriptionPlanConfig } from '../config/subscriptionPlans';
+import { isJwtExpired } from './jwt';
 
 const STORAGE_KEY = 'ghsnapflix_session';
 const DAY_MS = 24 * 60 * 60 * 1000;
+const TOKEN_KEY = 'token';
+const PAYMENT_DONE_KEY = 'payment_done';
+const OFFER_CODE_KEY = 'offerCode';
+const PHONE_KEY = 'phone';
 
 export interface StoredSubscription {
   planKey: SubscriptionPlanConfig['id'];
@@ -67,16 +72,41 @@ export const loadAppSession = (): {
   isLoggedIn: boolean;
   isSubscribed: boolean;
   subscription: StoredSubscription | null;
+  accessExpired: boolean;
 } => {
-  const storage = readStorage();
-  const session = storage.session;
-
-  if (!session?.msisdn) {
+  const token = getAuthToken();
+  if (token && isJwtExpired(token)) {
+    clearLoginSession();
     return {
       msisdn: '',
       isLoggedIn: false,
       isSubscribed: false,
       subscription: null,
+      accessExpired: true,
+    };
+  }
+
+  const storage = readStorage();
+  const session = storage.session;
+
+  if (!session?.msisdn) {
+    const phone = localStorage.getItem(PHONE_KEY) || '';
+    if (token && phone && !isJwtExpired(token)) {
+      return {
+        msisdn: phone.replace(/\D/g, ''),
+        isLoggedIn: true,
+        isSubscribed: localStorage.getItem(PAYMENT_DONE_KEY) === 'true',
+        subscription: null,
+        accessExpired: false,
+      };
+    }
+
+    return {
+      msisdn: '',
+      isLoggedIn: false,
+      isSubscribed: false,
+      subscription: null,
+      accessExpired: false,
     };
   }
 
@@ -88,8 +118,17 @@ export const loadAppSession = (): {
       delete storage.subscriptionsByMsisdn[session.msisdn];
       if (storage.session) {
         storage.session.subscription = null;
+        storage.session.isLoggedIn = false;
       }
       writeStorage(storage);
+      clearLoginSession();
+      return {
+        msisdn: '',
+        isLoggedIn: false,
+        isSubscribed: false,
+        subscription: null,
+        accessExpired: true,
+      };
     }
     subscription = null;
   } else if (storage.session) {
@@ -97,12 +136,26 @@ export const loadAppSession = (): {
     writeStorage(storage);
   }
 
+  const isSubscribed =
+    isSubscriptionActive(subscription) && Boolean(token) && !isJwtExpired(token);
+
   return {
     msisdn: session.msisdn,
-    isLoggedIn: session.isLoggedIn,
-    isSubscribed: isSubscriptionActive(subscription),
+    isLoggedIn: Boolean(session.isLoggedIn && token && !isJwtExpired(token) && isSubscribed),
+    isSubscribed,
     subscription,
+    accessExpired: false,
   };
+};
+
+export const getAuthToken = (): string => localStorage.getItem(TOKEN_KEY) || '';
+
+export const saveAuthToken = (token: string, msisdn?: string): void => {
+  localStorage.setItem(TOKEN_KEY, token);
+  localStorage.setItem(PAYMENT_DONE_KEY, 'true');
+  if (msisdn) {
+    localStorage.setItem(PHONE_KEY, msisdn);
+  }
 };
 
 export const saveLoginSession = (msisdn: string): void => {
@@ -155,6 +208,10 @@ export const clearLoginSession = (): void => {
   }
 
   writeStorage(storage);
+  localStorage.removeItem(TOKEN_KEY);
+  localStorage.removeItem(PAYMENT_DONE_KEY);
+  localStorage.removeItem(OFFER_CODE_KEY);
+  localStorage.removeItem(PHONE_KEY);
 };
 
 export const clearAllSessionData = (): void => {

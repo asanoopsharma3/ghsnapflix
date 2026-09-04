@@ -2,7 +2,11 @@ import React, { useState } from 'react';
 import './SubscriptionPage.css';
 import { SUBSCRIPTION_PLANS, SubscriptionPlanConfig } from '../config/subscriptionPlans';
 import { NOTIFICATION_MESSAGES, NotificationType } from '../constants/notifications';
-import { subscribe } from '../services/subscriptionService';
+import {
+  activateLocalSubscription,
+  LOCAL_SUBSCRIPTION_ENABLED,
+  startNheSubscription,
+} from '../config/subscription';
 
 interface SubscriptionPageProps {
   msisdn: string;
@@ -12,7 +16,7 @@ interface SubscriptionPageProps {
 
 const SubscriptionPage: React.FC<SubscriptionPageProps> = ({
   msisdn,
-  onSubscribeSuccess,
+  onSubscribeSuccess: _onSubscribeSuccess,
   onNotify,
 }) => {
   const [selectedPlan, setSelectedPlan] = useState<string>('monthly');
@@ -30,7 +34,7 @@ const SubscriptionPage: React.FC<SubscriptionPageProps> = ({
 
   const handleSubscribe = async (
     planId: string,
-    apiPlanId: string,
+    _apiPlanId: string,
     event: React.MouseEvent<HTMLButtonElement>
   ) => {
     event.stopPropagation();
@@ -43,17 +47,36 @@ const SubscriptionPage: React.FC<SubscriptionPageProps> = ({
     setSubscribingPlanId(planId);
 
     try {
-      const response = await subscribe(msisdn, apiPlanId);
-      const plan = SUBSCRIPTION_PLANS.find((item) => item.id === planId);
-
-      if (response.ok && plan) {
-        onSubscribeSuccess(plan);
-      } else {
+      if (!msisdn) {
         onNotify(NOTIFICATION_MESSAGES.SUBSCRIBE_ERROR, 'error');
+        setSubscribingPlanId(null);
+        return;
       }
+
+      const plan = SUBSCRIPTION_PLANS.find((item) => item.id === planId);
+      if (!plan) {
+        onNotify(NOTIFICATION_MESSAGES.SUBSCRIBE_ERROR, 'error');
+        setSubscribingPlanId(null);
+        return;
+      }
+
+      localStorage.setItem('offerCode', plan.offerCode);
+
+      if (LOCAL_SUBSCRIPTION_ENABLED) {
+        const result = await activateLocalSubscription(msisdn, plan.offerCode);
+        const params = new URLSearchParams({
+          token: result.token,
+          status: 'success',
+          offerCode: result.offerCode || plan.offerCode,
+          msisdn: result.msisdn || msisdn,
+        });
+        window.location.href = `/activation/callback?${params.toString()}`;
+        return;
+      }
+
+      startNheSubscription(msisdn, plan.offerCode);
     } catch {
       onNotify(NOTIFICATION_MESSAGES.SUBSCRIBE_ERROR, 'error');
-    } finally {
       setSubscribingPlanId(null);
     }
   };

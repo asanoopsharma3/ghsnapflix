@@ -2,13 +2,11 @@ import React, { useState, useCallback, useEffect } from 'react';
 import './App.css';
 import Header from './components/Header';
 import PostLoginHeader from './components/PostLoginHeader';
-import HeroSection from './components/HeroSection';
 import InteractiveCarousel from './components/InteractiveCarousel';
 import VideoCategories from './components/GameCategories';
 import VideosSection from './components/VideosSection';
 import FavoritesSection from './components/FavoritesSection';
 import LoginModal from './components/LoginModal';
-import OTPModal from './components/OTPModal';
 import RewardsPage from './components/RewardsPage';
 import ProfilePage from './components/ProfilePage';
 import SubscriptionPage from './components/SubscriptionPage';
@@ -23,29 +21,37 @@ import AboutPage from './components/AboutPage';
 import VideoPlayerModal from './components/VideoPlayerModal';
 import Notification from './components/Notification';
 import ThemeToggle from './components/ThemeToggle';
-import ParticleBackground from './components/ParticleBackground';
-import SimpleParticleBackground from './components/SimpleParticleBackground';
 import FloatingActionButton from './components/FloatingActionButton';
 import Footer from './components/Footer';
 import { TranslationProvider } from './contexts/TranslationContext';
-import { SendOtpResponse } from './types/auth';
+import { AUTH_EXPIRED_EVENT } from './api/axiosClient';
 import { NOTIFICATION_MESSAGES, NotificationType } from './constants/notifications';
+import {
+  activateLocalSubscription,
+  INITIAL_OFFER_CODE,
+  isMobileNetworkCandidate,
+  LOCAL_SUBSCRIPTION_ENABLED,
+  normalizeGhanaMsisdn,
+  startHeSubscription,
+  startNheSubscription,
+} from './config/subscription';
+import { getPlanByOfferCode, SubscriptionPlanConfig } from './config/subscriptionPlans';
 import {
   clearLoginSession,
   loadAppSession,
+  saveAuthToken,
   saveLoginSession,
   saveSubscription,
 } from './utils/sessionStorage';
-import { SubscriptionPlanConfig } from './config/subscriptionPlans';
+import { fetchSubscriptionStatus } from './services/subscriptionService';
 import { PlayableVideo } from './types/video';
+import LoadingSpinner from './components/LoadingSpinner';
 
 type Page = 'home' | 'rewards' | 'profile' | 'subscription' | 'news' | 'unsubscribe' | 'subscription-management' | 'videos' | 'favorites' | 'explore' | 'faq' | 'about';
 
 function AppContent() {
   const [showLoginModal, setShowLoginModal] = useState(false);
-  const [showOTPModal, setShowOTPModal] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState('');
-  const [otpSession, setOtpSession] = useState<SendOtpResponse | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [currentPage, setCurrentPage] = useState<Page>('home');
@@ -55,19 +61,137 @@ function AppContent() {
   } | null>(null);
   const [currentTheme, setCurrentTheme] = useState<'light' | 'dark'>('dark');
   const [activeVideo, setActiveVideo] = useState<PlayableVideo | null>(null);
+  const [isHandlingCallback, setIsHandlingCallback] = useState(
+    window.location.pathname.includes('/activation/callback')
+  );
 
   useEffect(() => {
-    const syncSession = () => {
+    const params = new URLSearchParams(window.location.search);
+    const isCallback = window.location.pathname.includes('/activation/callback');
+
+    const applySession = (subscribed?: boolean) => {
       const saved = loadAppSession();
       setPhoneNumber(saved.msisdn);
       setIsLoggedIn(saved.isLoggedIn);
-      setIsSubscribed(saved.isSubscribed);
+      setIsSubscribed(subscribed ?? saved.isSubscribed);
+
+      if (saved.accessExpired) {
+        setShowLoginModal(true);
+        setNotification({
+          message: NOTIFICATION_MESSAGES.SUBSCRIPTION_EXPIRED,
+          type: 'info',
+        });
+      }
     };
 
-    syncSession();
+    const handleActivationCallback = async () => {
+      const token = params.get('token');
+      const status = (params.get('status') || '').toLowerCase();
+      const reason =
+        params.get('reason') ||
+        params.get('message') ||
+        'We could not complete your subscription.';
+      const offerCode =
+        params.get('offerCode') || localStorage.getItem('offerCode') || INITIAL_OFFER_CODE;
+      const msisdn = normalizeGhanaMsisdn(
+        params.get('msisdn') || localStorage.getItem('phone') || ''
+      );
+      const isSuccess =
+        status === 'success' ||
+        status === 'successful' ||
+        params.get('success') === 'true' ||
+        params.get('subscribed') === 'true';
 
-    const intervalId = window.setInterval(syncSession, 60 * 1000);
+      window.history.replaceState({}, '', '/');
+
+      if (isSuccess && token) {
+        saveAuthToken(token, msisdn);
+        if (msisdn) {
+          saveLoginSession(msisdn);
+          const plan = getPlanByOfferCode(offerCode);
+          if (plan) {
+            saveSubscription(msisdn, { ...plan, durationDays: 1 });
+          }
+        }
+        localStorage.setItem('offerCode', offerCode);
+        applySession(true);
+        setCurrentPage('home');
+        setNotification({
+          message: NOTIFICATION_MESSAGES.OTP_VERIFIED_SUCCESS,
+          type: 'success',
+        });
+        setIsHandlingCallback(false);
+        return;
+      }
+
+      localStorage.removeItem('payment_done');
+      applySession(false);
+      setShowLoginModal(true);
+      setNotification({
+        message: reason,
+        type: 'error',
+      });
+      setIsHandlingCallback(false);
+    };
+
+    const syncFromBackend = async () => {
+      const saved = loadAppSession();
+      applySession();
+      if (!localStorage.getItem('token')) {
+        return;
+      }
+
+      try {
+        const subscription = await fetchSubscriptionStatus();
+        const active = subscription?.subscriptionStatus === 'active';
+        if (!active) {
+          clearLoginSession();
+          applySession();
+          setShowLoginModal(true);
+          setNotification({
+            message: NOTIFICATION_MESSAGES.SUBSCRIPTION_EXPIRED,
+            type: 'info',
+          });
+          return;
+        }
+        setIsSubscribed(true);
+        if (saved.msisdn) {
+          const plan = getPlanByOfferCode(localStorage.getItem('offerCode') || INITIAL_OFFER_CODE);
+          if (plan) {
+            saveSubscription(saved.msisdn, { ...plan, durationDays: 1 });
+          }
+        }
+      } catch {
+        applySession();
+      }
+    };
+
+    if (isCallback) {
+      void handleActivationCallback();
+      return;
+    }
+
+    void syncFromBackend();
+    const intervalId = window.setInterval(() => applySession(), 60 * 1000);
     return () => window.clearInterval(intervalId);
+  }, []);
+
+  useEffect(() => {
+    const onUnauthorized = () => {
+      clearLoginSession();
+      setIsLoggedIn(false);
+      setIsSubscribed(false);
+      setPhoneNumber('');
+      setCurrentPage('home');
+      setShowLoginModal(true);
+      setNotification({
+        message: NOTIFICATION_MESSAGES.SUBSCRIPTION_EXPIRED,
+        type: 'info',
+      });
+    };
+
+    window.addEventListener(AUTH_EXPIRED_EVENT, onUnauthorized);
+    return () => window.removeEventListener(AUTH_EXPIRED_EVENT, onUnauthorized);
   }, []);
 
   const handleVideoPlay = useCallback((video: PlayableVideo): boolean => {
@@ -80,7 +204,11 @@ function AppContent() {
     setIsSubscribed(saved.isSubscribed);
 
     if (!saved.isSubscribed) {
-      setCurrentPage('subscription');
+      if (saved.msisdn) {
+        startNheSubscription(saved.msisdn, INITIAL_OFFER_CODE);
+      } else {
+        setShowLoginModal(true);
+      }
       return false;
     }
 
@@ -107,44 +235,47 @@ function AppContent() {
     });
   }, []);
 
-  const handleLoginSubmit = useCallback((msisdn: string, otpResponse: SendOtpResponse) => {
-    setPhoneNumber(msisdn);
-    setOtpSession(otpResponse);
-    setShowLoginModal(false);
-    setShowOTPModal(true);
-    setNotification({
-      message: NOTIFICATION_MESSAGES.OTP_SENT_SUCCESS,
-      type: 'success',
-    });
+  const startCgwForMsisdn = useCallback(async (msisdn: string) => {
+    localStorage.setItem('phone', msisdn);
+    localStorage.setItem('offerCode', INITIAL_OFFER_CODE);
+
+    if (LOCAL_SUBSCRIPTION_ENABLED) {
+      const result = await activateLocalSubscription(msisdn, INITIAL_OFFER_CODE);
+      const params = new URLSearchParams({
+        token: result.token,
+        status: 'success',
+        offerCode: result.offerCode || INITIAL_OFFER_CODE,
+        msisdn: result.msisdn || msisdn,
+      });
+      window.location.href = `/activation/callback?${params.toString()}`;
+      return;
+    }
+
+    startNheSubscription(msisdn, INITIAL_OFFER_CODE);
   }, []);
+
+  const handleLoginSubmit = useCallback(async (msisdn: string) => {
+    setPhoneNumber(msisdn);
+    saveLoginSession(msisdn);
+    setIsLoggedIn(true);
+
+    try {
+      await startCgwForMsisdn(msisdn);
+    } catch {
+      setShowLoginModal(false);
+      setNotification({
+        message: NOTIFICATION_MESSAGES.SUBSCRIBE_ERROR,
+        type: 'error',
+      });
+    }
+  }, [startCgwForMsisdn]);
 
   const handleNotify = useCallback((message: string, type: NotificationType) => {
     setNotification({ message, type });
   }, []);
 
-  const handleOTPVerify = useCallback(() => {
-    setShowOTPModal(false);
-    setIsLoggedIn(true);
-    saveLoginSession(phoneNumber);
-
-    const saved = loadAppSession();
-    setIsSubscribed(saved.isSubscribed);
-
-    setCurrentPage(saved.isSubscribed ? 'home' : 'subscription');
-    setNotification({
-      message: NOTIFICATION_MESSAGES.OTP_VERIFIED_SUCCESS,
-      type: 'success',
-    });
-  }, [phoneNumber]);
-
-  const handleOTPBack = useCallback(() => {
-    setShowOTPModal(false);
-    setShowLoginModal(true);
-  }, []);
-
   const handleCloseModals = useCallback(() => {
     setShowLoginModal(false);
-    setShowOTPModal(false);
   }, []);
 
   const handleLogout = useCallback(() => {
@@ -152,7 +283,6 @@ function AppContent() {
     setIsLoggedIn(false);
     setIsSubscribed(false);
     setPhoneNumber('');
-    setOtpSession(null);
     setCurrentPage('home');
   }, []);
 
@@ -168,12 +298,22 @@ function AppContent() {
     }
 
     if (!isLoggedIn) {
+      if (isMobileNetworkCandidate()) {
+        startHeSubscription(INITIAL_OFFER_CODE);
+        return;
+      }
       setShowLoginModal(true);
       return;
     }
 
-    setCurrentPage('subscription');
-  }, [isLoggedIn]);
+    const msisdn = phoneNumber || saved.msisdn;
+    if (msisdn) {
+      void startCgwForMsisdn(msisdn);
+      return;
+    }
+
+    setShowLoginModal(true);
+  }, [isLoggedIn, phoneNumber, startCgwForMsisdn]);
 
   const handleNavigate = useCallback((page: string) => {
     if (page === 'login') {
@@ -246,6 +386,14 @@ function AppContent() {
     }
   };
 
+  if (isHandlingCallback) {
+    return (
+      <div className="App" data-theme={currentTheme}>
+        <LoadingSpinner />
+      </div>
+    );
+  }
+
   return (
     <div className="App" data-theme={currentTheme}>
       {/* Particle background disabled for performance - was causing crashes */}
@@ -276,17 +424,6 @@ function AppContent() {
       {showLoginModal && (
         <LoginModal 
           onSubmit={handleLoginSubmit}
-          onNotify={handleNotify}
-          onClose={handleCloseModals}
-        />
-      )}
-      
-      {showOTPModal && (
-        <OTPModal 
-          phoneNumber={phoneNumber}
-          otpSession={otpSession}
-          onVerify={handleOTPVerify}
-          onBack={handleOTPBack}
           onNotify={handleNotify}
           onClose={handleCloseModals}
         />

@@ -1,12 +1,11 @@
 import { apiClient } from '../api/axiosClient';
 import { API_CONFIG } from '../config/api';
-import { SubscribeResponse } from '../types/subscription';
+import { SubscriptionStatusPayload, SubscriptionStatusResponse } from '../types/subscription';
 
-export async function subscribe(msisdn: string, planId: string): Promise<SubscribeResponse> {
-  const { data } = await apiClient.post<SubscribeResponse>(API_CONFIG.endpoints.subscribe, {
-    msisdn,
-    plan_id: planId,
-  });
+export async function fetchSubscriptionStatus(): Promise<SubscriptionStatusPayload | null> {
+  const { data } = await apiClient.get<SubscriptionStatusResponse>(
+    API_CONFIG.endpoints.subscriptionStatus
+  );
 
-  return data;
+  return data.subscription ?? null;
 }

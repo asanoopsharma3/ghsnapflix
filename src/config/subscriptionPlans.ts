@@ -6,6 +6,7 @@ export interface SubscriptionPlanConfig {
   price: number;
   originalPrice?: number;
   planId: string;
+  offerCode: string;
   features: string[];
   popular: boolean;
   discount?: string;
@@ -19,6 +20,7 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlanConfig[] = [
     durationDays: 1,
     price: 1,
     planId: '26801220000007963',
+    offerCode: '9916310061',
     popular: false,
     features: ['Unlimited Videos', 'HD Quality', 'Mobile Access', 'Ad-Free Experience'],
   },
@@ -30,6 +32,7 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlanConfig[] = [
     price: 5,
     originalPrice: 15,
     planId: '26801220000007964',
+    offerCode: '9916310061',
     discount: '29% OFF',
     popular: false,
     features: [
@@ -48,6 +51,7 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlanConfig[] = [
     price: 15,
     originalPrice: 25,
     planId: '26801220000007965',
+    offerCode: '9916310061',
     discount: '40% OFF',
     popular: true,
     features: [
@@ -64,3 +68,6 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlanConfig[] = [
 
 export const getPlanById = (id: string): SubscriptionPlanConfig | undefined =>
   SUBSCRIPTION_PLANS.find((plan) => plan.id === id);
+
+export const getPlanByOfferCode = (offerCode: string): SubscriptionPlanConfig | undefined =>
+  SUBSCRIPTION_PLANS.find((plan) => plan.offerCode === offerCode) || SUBSCRIPTION_PLANS[0];

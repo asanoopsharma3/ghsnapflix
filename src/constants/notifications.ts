@@ -4,6 +4,7 @@ export const NOTIFICATION_MESSAGES = {
   OTP_VERIFIED_SUCCESS: 'Verified successfully',
   SUBSCRIBE_ERROR: 'There is an error ,please try again later',
   ALREADY_SUBSCRIBED: 'You are already subscribed',
+  SUBSCRIPTION_EXPIRED: 'Your daily subscription has expired. Please subscribe again.',
 } as const;
 
 export type NotificationType = 'success' | 'error' | 'info';

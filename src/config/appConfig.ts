@@ -15,6 +15,22 @@ export const APP_CONFIG = {
     proxyBaseUrl: rawConfig.proxyBaseUrl,
     endpoints: rawConfig.endpoints,
   },
+  cgw: rawConfig.cgw as {
+    initialOfferCode: string;
+    topupOfferCode: string;
+    heFixedMobileNumber: string;
+    env: 'staging' | 'production';
+    heRedirectUrl: string;
+    heCallbackUrl: string;
+    nhePortalStaging: string;
+    nhePortalProduction: string;
+    heBaseUrl: string;
+    nonHeBaseUrl: string;
+    callbackUrl: string;
+    forceHe: boolean;
+    localSubscription: boolean;
+    localHeMsisdn: string;
+  },
 } as const;
 
 export const isProductionEnv = (): boolean => APP_CONFIG.environment === 'production';

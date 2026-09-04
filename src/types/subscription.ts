@@ -29,3 +29,19 @@ export interface SubscribeResponse {
   };
   errorMessage?: string | null;
 }
+
+export interface SubscriptionStatusPayload {
+  subscriptionStatus?: string;
+  quizAccessStatus?: string;
+  questionsPlayedToday?: number;
+  questionsRemaining?: number;
+  dailyQuestionLimit?: number;
+  canPlay?: boolean;
+  message?: string;
+}
+
+export interface SubscriptionStatusResponse {
+  success?: boolean;
+  subscription?: SubscriptionStatusPayload;
+  message?: string;
+}
