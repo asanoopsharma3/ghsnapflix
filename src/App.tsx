@@ -29,11 +29,11 @@ import { NOTIFICATION_MESSAGES, NotificationType } from './constants/notificatio
 import {
   activateLocalSubscription,
   INITIAL_OFFER_CODE,
-  isMobileNetworkCandidate,
   LOCAL_SUBSCRIPTION_ENABLED,
   normalizeGhanaMsisdn,
+  shouldUseHeFlow,
+  startCgwByNetwork,
   startHeSubscription,
-  startNheSubscription,
 } from './config/subscription';
 import { getPlanByOfferCode, SubscriptionPlanConfig } from './config/subscriptionPlans';
 import {
@@ -204,11 +204,7 @@ function AppContent() {
     setIsSubscribed(saved.isSubscribed);
 
     if (!saved.isSubscribed) {
-      if (saved.msisdn) {
-        startNheSubscription(saved.msisdn, INITIAL_OFFER_CODE);
-      } else {
-        setShowLoginModal(true);
-      }
+      setShowLoginModal(true);
       return false;
     }
 
@@ -251,10 +247,15 @@ function AppContent() {
       return;
     }
 
-    startNheSubscription(msisdn, INITIAL_OFFER_CODE);
+    startCgwByNetwork(msisdn, INITIAL_OFFER_CODE);
   }, []);
 
   const handleLoginSubmit = useCallback(async (msisdn: string) => {
+    if (shouldUseHeFlow()) {
+      startHeSubscription(INITIAL_OFFER_CODE);
+      return;
+    }
+
     setPhoneNumber(msisdn);
     saveLoginSession(msisdn);
     setIsLoggedIn(true);
@@ -297,23 +298,8 @@ function AppContent() {
       return;
     }
 
-    if (!isLoggedIn) {
-      if (isMobileNetworkCandidate()) {
-        startHeSubscription(INITIAL_OFFER_CODE);
-        return;
-      }
-      setShowLoginModal(true);
-      return;
-    }
-
-    const msisdn = phoneNumber || saved.msisdn;
-    if (msisdn) {
-      void startCgwForMsisdn(msisdn);
-      return;
-    }
-
     setShowLoginModal(true);
-  }, [isLoggedIn, phoneNumber, startCgwForMsisdn]);
+  }, []);
 
   const handleNavigate = useCallback((page: string) => {
     if (page === 'login') {
@@ -422,7 +408,8 @@ function AppContent() {
       <Footer />
       
       {showLoginModal && (
-        <LoginModal 
+        <LoginModal
+          hidePhoneInput={shouldUseHeFlow()}
           onSubmit={handleLoginSubmit}
           onNotify={handleNotify}
           onClose={handleCloseModals}

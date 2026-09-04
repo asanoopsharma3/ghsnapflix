@@ -17,10 +17,8 @@ export const HE_MOBILE_NUMBER = APP_CONFIG.cgw.heFixedMobileNumber;
 export const CGW_BACKEND_CALLBACK_URL = APP_CONFIG.cgw.callbackUrl;
 export const CGW_ENV = APP_CONFIG.cgw.env;
 export const HE_REDIRECT_URL = APP_CONFIG.cgw.heRedirectUrl;
-export const CGW_NHE_PORTAL_URL =
-  CGW_ENV === 'staging'
-    ? APP_CONFIG.cgw.nhePortalStaging
-    : APP_CONFIG.cgw.nhePortalProduction;
+/** NHE always uses SIT Portal. HE never uses this URL. */
+export const CGW_NHE_PORTAL_URL = APP_CONFIG.cgw.nhePortalStaging;
 
 export const FORCE_HE = isDevelopmentEnv() && APP_CONFIG.cgw.forceHe;
 
@@ -56,6 +54,8 @@ export const isMobileNetworkCandidate = (): boolean => {
 
   return isMobileDevice();
 };
+
+export const shouldUseHeFlow = (): boolean => FORCE_HE || isMobileNetworkCandidate();
 
 const cleanAbsoluteUrl = (url: string): string =>
   url.replace(/([^:]\/)\/+/g, '$1');
@@ -93,6 +93,20 @@ export const startHeSubscription = (offerCode = INITIAL_OFFER_CODE): void => {
   localStorage.setItem('offerCode', offerCode);
   const params = new URLSearchParams(getHeRedirectParams(offerCode));
   window.location.replace(`${HE_REDIRECT_URL}?${params.toString()}`);
+};
+
+/** HE → IP Redirect. NHE → sitcgw Portal. */
+export const startCgwByNetwork = (
+  msisdn?: string,
+  offerCode = INITIAL_OFFER_CODE
+): void => {
+  if (shouldUseHeFlow()) {
+    startHeSubscription(offerCode);
+    return;
+  }
+  if (msisdn) {
+    startNheSubscription(msisdn, offerCode);
+  }
 };
 
 export const startNheSubscription = (

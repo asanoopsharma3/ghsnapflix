@@ -29,10 +29,10 @@ const proxyBaseUrl = apiBaseUrl;
 
 const CGW_ENV =
   String(
-    process.env.REACT_APP_CGW_ENV || process.env.VITE_CGW_ENV || 'production'
-  ).toLowerCase() === 'staging'
-    ? 'staging'
-    : 'production';
+    process.env.REACT_APP_CGW_ENV || process.env.VITE_CGW_ENV || 'staging'
+  ).toLowerCase() === 'production'
+    ? 'production'
+    : 'staging';
 
 const HE_REDIRECT_URL =
   process.env.REACT_APP_HE_REDIRECT_URL ||

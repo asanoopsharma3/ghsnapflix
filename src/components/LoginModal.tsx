@@ -11,12 +11,18 @@ import {
 } from '../constants/phone';
 
 interface LoginModalProps {
+  hidePhoneInput?: boolean;
   onSubmit: (msisdn: string) => void | Promise<void>;
   onNotify: (message: string, type: NotificationType) => void;
   onClose: () => void;
 }
 
-const LoginModal: React.FC<LoginModalProps> = ({ onSubmit, onNotify, onClose }) => {
+const LoginModal: React.FC<LoginModalProps> = ({
+  hidePhoneInput = false,
+  onSubmit,
+  onNotify,
+  onClose,
+}) => {
   const { t } = useTranslation();
   const [phone, setPhone] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -28,11 +34,11 @@ const LoginModal: React.FC<LoginModalProps> = ({ onSubmit, onNotify, onClose }) 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!isValidLocalPhoneInput(phone)) {
+    if (!hidePhoneInput && !isValidLocalPhoneInput(phone)) {
       return;
     }
 
-    const msisdn = buildMsisdn(phone);
+    const msisdn = hidePhoneInput ? '' : buildMsisdn(phone);
     setIsLoading(true);
 
     try {
@@ -44,7 +50,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ onSubmit, onNotify, onClose }) 
     }
   };
 
-  const isSubmitDisabled = !isValidLocalPhoneInput(phone) || isLoading;
+  const isSubmitDisabled = isLoading || (!hidePhoneInput && !isValidLocalPhoneInput(phone));
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -86,23 +92,25 @@ const LoginModal: React.FC<LoginModalProps> = ({ onSubmit, onNotify, onClose }) 
         </div>
 
         <form onSubmit={handleSubmit} className="modal-form">
-          <div className="input-group">
-            <label className="input-label">{t('login.phone.label')}</label>
-            <div className="phone-input-wrapper">
-              <span className="phone-prefix">+{COUNTRY_CODE}</span>
-              <input
-                type="tel"
-                inputMode="numeric"
-                value={phone}
-                onChange={handlePhoneChange}
-                className="phone-input"
-                placeholder="241234567"
-                maxLength={PHONE_INPUT_MAX_LENGTH}
-                disabled={isLoading}
-                autoComplete="tel-national"
-              />
+          {!hidePhoneInput && (
+            <div className="input-group">
+              <label className="input-label">{t('login.phone.label')}</label>
+              <div className="phone-input-wrapper">
+                <span className="phone-prefix">+{COUNTRY_CODE}</span>
+                <input
+                  type="tel"
+                  inputMode="numeric"
+                  value={phone}
+                  onChange={handlePhoneChange}
+                  className="phone-input"
+                  placeholder="241234567"
+                  maxLength={PHONE_INPUT_MAX_LENGTH}
+                  disabled={isLoading}
+                  autoComplete="tel-national"
+                />
+              </div>
             </div>
-          </div>
+          )}
 
           <button
             type="submit"

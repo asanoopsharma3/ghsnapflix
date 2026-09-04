@@ -5,7 +5,7 @@ import { NOTIFICATION_MESSAGES, NotificationType } from '../constants/notificati
 import {
   activateLocalSubscription,
   LOCAL_SUBSCRIPTION_ENABLED,
-  startNheSubscription,
+  startCgwByNetwork,
 } from '../config/subscription';
 
 interface SubscriptionPageProps {
@@ -74,7 +74,7 @@ const SubscriptionPage: React.FC<SubscriptionPageProps> = ({
         return;
       }
 
-      startNheSubscription(msisdn, plan.offerCode);
+      startCgwByNetwork(msisdn, plan.offerCode);
     } catch {
       onNotify(NOTIFICATION_MESSAGES.SUBSCRIBE_ERROR, 'error');
       setSubscribingPlanId(null);
