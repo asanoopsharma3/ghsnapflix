@@ -1,8 +1,9 @@
-import React, { useCallback, useState, useRef, useEffect, useLayoutEffect } from 'react';
+import React, { useCallback, useState, useRef, useEffect } from 'react';
 import './GameCategories.css';
 import { useTranslation } from '../contexts/TranslationContext';
 import { topTrendingVideos, adventureVideos, actionVideos, brainteaseVideos, fightingVideos, getVideoUrl } from '../utils/localVideos';
 import { VideoPlayHandler } from '../types/video';
+import { useCardVideoPreview } from '../hooks/useCardVideoPreview';
 
 interface VideoItem {
   name: string;
@@ -26,55 +27,11 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, onVideoPlay, onFavorite, i
   const [isHovered, setIsHovered] = useState(false);
   const [showVideo, setShowVideo] = useState(false);
   const [favorite, setFavorite] = useState(isFavorite || false);
-  const videoRef = useRef<HTMLVideoElement>(null);
   const touchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   
   // Get video URL
   const videoUrl = video.video;
-  
-  // Disable thumbnail generation for sections to prevent crashes
-  // Use placeholder instead - much better performance
-  const thumbnailSrc = null;
-
-  // Keep <video> always mounted so ref exists; load/play on hover (useLayoutEffect runs after ref attach)
-  useLayoutEffect(() => {
-    const videoEl = videoRef.current;
-    if (!videoEl || !videoUrl) return;
-
-    if (isHovered && showVideo) {
-      try {
-        const next = new URL(videoUrl).href;
-        if (videoEl.src !== next) {
-          videoEl.src = videoUrl;
-          videoEl.load();
-        }
-      } catch {
-        if (videoEl.getAttribute('src') !== videoUrl) {
-          videoEl.src = videoUrl;
-          videoEl.load();
-        }
-      }
-
-      const tryPlay = () => {
-        if (!videoRef.current) return;
-        videoRef.current.currentTime = 0;
-        videoRef.current.play().catch(() => {});
-      };
-
-      if (videoEl.readyState >= 2) {
-        tryPlay();
-      } else {
-        const onCanPlay = () => tryPlay();
-        videoEl.addEventListener('canplay', onCanPlay, { once: true });
-        return () => videoEl.removeEventListener('canplay', onCanPlay);
-      }
-    } else {
-      videoEl.pause();
-      videoEl.removeAttribute('src');
-      videoEl.load();
-    }
-    return undefined;
-  }, [isHovered, showVideo, videoUrl]);
+  const { containerRef, videoRef, hasFrame } = useCardVideoPreview(videoUrl, isHovered && showVideo);
 
   const handleFavoriteClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -142,10 +99,10 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, onVideoPlay, onFavorite, i
       onMouseLeave={handleMouseLeave}
       onTouchStart={handleTouchStart}
     >
-      <div className="video-image-container">
+      <div className="video-image-container" ref={containerRef}>
         <video
           ref={videoRef}
-          className={`video-element ${showVideo ? 'visible' : ''}`}
+          className={`video-element ${hasFrame || showVideo ? 'visible' : ''}`}
           muted
           playsInline
           loop
@@ -154,8 +111,8 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, onVideoPlay, onFavorite, i
             console.error('Video load error:', videoUrl);
           }}
         />
-        {!showVideo && (
-          <div 
+        {!hasFrame && !showVideo && (
+          <div
             className="video-image video-image-placeholder"
             style={{
               position: 'absolute',
@@ -171,7 +128,6 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, onVideoPlay, onFavorite, i
             }}
           >
             <div style={{ textAlign: 'center', color: '#fff' }}>
-              <div style={{ fontSize: '48px', marginBottom: '10px', opacity: 0.8 }}>🎬</div>
               <div style={{ fontSize: '14px', fontWeight: 600, opacity: 0.9 }}>{video.name}</div>
             </div>
           </div>

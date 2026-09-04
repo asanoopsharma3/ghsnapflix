@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import './FavoritesPage.css';
 import { allVideos, getVideoUrl } from '../utils/localVideos';
 import { VideoPlayHandler } from '../types/video';
+import { useCardVideoPreview } from '../hooks/useCardVideoPreview';
 
 interface VideoItem {
   name: string;
@@ -17,49 +18,8 @@ interface FavoritePageCardProps {
 
 const FavoritePageCard: React.FC<FavoritePageCardProps> = ({ video, onVideoPlay, onRemove }) => {
   const [showVideo, setShowVideo] = useState(false);
-  const videoRef = useRef<HTMLVideoElement>(null);
   const videoUrl = video.video;
-  // Disable thumbnail generation to prevent crashes - use placeholder
-  const thumbnailSrc = null;
-
-  useLayoutEffect(() => {
-    const videoEl = videoRef.current;
-    if (!videoEl || !videoUrl) return;
-
-    if (showVideo) {
-      try {
-        const next = new URL(videoUrl).href;
-        if (videoEl.src !== next) {
-          videoEl.src = videoUrl;
-          videoEl.load();
-        }
-      } catch {
-        if (videoEl.getAttribute('src') !== videoUrl) {
-          videoEl.src = videoUrl;
-          videoEl.load();
-        }
-      }
-
-      const tryPlay = () => {
-        if (!videoRef.current) return;
-        videoRef.current.currentTime = 0;
-        videoRef.current.play().catch(() => {});
-      };
-
-      if (videoEl.readyState >= 2) {
-        tryPlay();
-      } else {
-        const onCanPlay = () => tryPlay();
-        videoEl.addEventListener('canplay', onCanPlay, { once: true });
-        return () => videoEl.removeEventListener('canplay', onCanPlay);
-      }
-    } else {
-      videoEl.pause();
-      videoEl.removeAttribute('src');
-      videoEl.load();
-    }
-    return undefined;
-  }, [showVideo, videoUrl]);
+  const { containerRef, videoRef, hasFrame } = useCardVideoPreview(videoUrl, showVideo);
 
   const handleClick = () => {
     onVideoPlay?.({
@@ -76,10 +36,10 @@ const FavoritePageCard: React.FC<FavoritePageCardProps> = ({ video, onVideoPlay,
       onMouseEnter={() => setShowVideo(true)}
       onMouseLeave={() => setShowVideo(false)}
     >
-      <div className="favorite-video-container-page">
+      <div className="favorite-video-container-page" ref={containerRef}>
         <video
           ref={videoRef}
-          className={`favorite-video-element-page ${showVideo ? 'favorite-video-page-visible' : ''}`}
+          className={`favorite-video-element-page ${hasFrame || showVideo ? 'favorite-video-page-visible' : ''}`}
           muted
           playsInline
           loop
@@ -88,14 +48,7 @@ const FavoritePageCard: React.FC<FavoritePageCardProps> = ({ video, onVideoPlay,
             console.error('Favorite page video load error:', videoUrl);
           }}
         />
-        {!showVideo && (
-          thumbnailSrc ? (
-            <img
-              src={thumbnailSrc}
-              alt={video.name}
-              className="favorite-thumbnail"
-            />
-          ) : (
+        {!hasFrame && !showVideo && (
             <div className="favorite-thumbnail favorite-thumbnail-placeholder" style={{ 
               background: 'linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%)',
               display: 'flex', 
@@ -104,9 +57,8 @@ const FavoritePageCard: React.FC<FavoritePageCardProps> = ({ video, onVideoPlay,
               color: '#999',
               zIndex: 4
             }}>
-              <span>Loading...</span>
+              <span>{video.name}</span>
             </div>
-          )
         )}
         <button
           className="remove-favorite-btn"

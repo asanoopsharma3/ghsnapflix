@@ -83,6 +83,51 @@
   padding-top: 40px;
 }
 
+.nhe-phone-block {
+  max-width: 420px;
+  margin: 0 auto 36px;
+}
+
+.nhe-phone-label {
+  display: block;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.nhe-phone-wrapper {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+}
+
+.nhe-phone-wrapper:focus-within {
+  border-color: #0d9488;
+}
+
+.nhe-phone-prefix {
+  padding: 14px 12px 14px 18px;
+  color: #fff;
+  font-weight: 600;
+  border-right: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.nhe-phone-input {
+  flex: 1;
+  padding: 14px 18px;
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 16px;
+}
+
+.nhe-phone-input:focus {
+  outline: none;
+}
+
 .main-title {
   font-size: 3.5rem;
   font-weight: 800;

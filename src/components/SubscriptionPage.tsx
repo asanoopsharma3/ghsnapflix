@@ -5,8 +5,16 @@ import { NOTIFICATION_MESSAGES, NotificationType } from '../constants/notificati
 import {
   activateLocalSubscription,
   LOCAL_SUBSCRIPTION_ENABLED,
+  shouldUseHeFlow,
   startCgwByNetwork,
 } from '../config/subscription';
+import {
+  buildMsisdn,
+  COUNTRY_CODE,
+  isValidLocalPhoneInput,
+  PHONE_INPUT_MAX_LENGTH,
+  sanitizeLocalPhoneInput,
+} from '../constants/phone';
 
 interface SubscriptionPageProps {
   msisdn: string;
@@ -21,6 +29,11 @@ const SubscriptionPage: React.FC<SubscriptionPageProps> = ({
 }) => {
   const [selectedPlan, setSelectedPlan] = useState<string>('monthly');
   const [subscribingPlanId, setSubscribingPlanId] = useState<string | null>(null);
+  const [phone, setPhone] = useState(() =>
+    msisdn.startsWith(COUNTRY_CODE) ? msisdn.slice(COUNTRY_CODE.length) : ''
+  );
+  const showPhoneInput = !shouldUseHeFlow();
+  const nheMsisdn = showPhoneInput ? buildMsisdn(phone) : msisdn;
 
   const selectedPlanData = SUBSCRIPTION_PLANS.find((plan) => plan.id === selectedPlan);
   const isSubscribing = subscribingPlanId !== null;
@@ -47,7 +60,13 @@ const SubscriptionPage: React.FC<SubscriptionPageProps> = ({
     setSubscribingPlanId(planId);
 
     try {
-      if (!msisdn) {
+      if (showPhoneInput && !isValidLocalPhoneInput(phone)) {
+        onNotify(NOTIFICATION_MESSAGES.SUBSCRIBE_ERROR, 'error');
+        setSubscribingPlanId(null);
+        return;
+      }
+
+      if (!nheMsisdn && !shouldUseHeFlow()) {
         onNotify(NOTIFICATION_MESSAGES.SUBSCRIBE_ERROR, 'error');
         setSubscribingPlanId(null);
         return;
@@ -63,18 +82,18 @@ const SubscriptionPage: React.FC<SubscriptionPageProps> = ({
       localStorage.setItem('offerCode', plan.offerCode);
 
       if (LOCAL_SUBSCRIPTION_ENABLED) {
-        const result = await activateLocalSubscription(msisdn, plan.offerCode);
+        const result = await activateLocalSubscription(nheMsisdn, plan.offerCode);
         const params = new URLSearchParams({
           token: result.token,
           status: 'success',
           offerCode: result.offerCode || plan.offerCode,
-          msisdn: result.msisdn || msisdn,
+          msisdn: result.msisdn || nheMsisdn,
         });
         window.location.href = `/activation/callback?${params.toString()}`;
         return;
       }
 
-      startCgwByNetwork(msisdn, plan.offerCode);
+      startCgwByNetwork(nheMsisdn, plan.offerCode);
     } catch {
       onNotify(NOTIFICATION_MESSAGES.SUBSCRIBE_ERROR, 'error');
       setSubscribingPlanId(null);
@@ -107,6 +126,27 @@ const SubscriptionPage: React.FC<SubscriptionPageProps> = ({
           </h1>
           <p className="subtitle">Unlock unlimited video content and premium features</p>
         </div>
+
+        {showPhoneInput && (
+          <div className="nhe-phone-block">
+            <label className="nhe-phone-label" htmlFor="nhe-phone">Mobile number</label>
+            <div className="nhe-phone-wrapper">
+              <span className="nhe-phone-prefix">+{COUNTRY_CODE}</span>
+              <input
+                id="nhe-phone"
+                type="tel"
+                inputMode="numeric"
+                className="nhe-phone-input"
+                value={phone}
+                onChange={(e) => setPhone(sanitizeLocalPhoneInput(e.target.value))}
+                placeholder="241234567"
+                maxLength={PHONE_INPUT_MAX_LENGTH}
+                disabled={isSubscribing}
+                autoComplete="tel-national"
+              />
+            </div>
+          </div>
+        )}
 
         <div className="plans-section">
           <div className="plans-grid">
