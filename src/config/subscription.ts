@@ -47,12 +47,20 @@ export const isMobileDevice = (): boolean => {
 export const isMobileNetworkCandidate = (): boolean => {
   const nav = navigator as NavigatorWithConnection;
   const connection = nav.connection || nav.mozConnection || nav.webkitConnection;
-  const connectionType = connection?.type?.toLowerCase();
-  if (connectionType === 'wifi') {
+  const connectionType = String(connection?.type || '').toLowerCase();
+
+  if (
+    connectionType === 'wifi' ||
+    connectionType === 'ethernet' ||
+    connectionType === 'bluetooth' ||
+    connectionType === 'mixed' ||
+    connectionType === 'other' ||
+    connectionType === 'none'
+  ) {
     return false;
   }
 
-  return isMobileDevice();
+  return connectionType === 'cellular';
 };
 
 export const shouldUseHeFlow = (): boolean => FORCE_HE || isMobileNetworkCandidate();
