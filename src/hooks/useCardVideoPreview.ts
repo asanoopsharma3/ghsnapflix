@@ -1,36 +1,107 @@
 import { useEffect, useRef, useState } from 'react';
 
-const PREVIEW_PLAY_MS = 2000;
+const MAX_CONCURRENT_POSTERS = 2;
+const POSTER_MIN_SECONDS = 2.4;
 
-const assignVideoSrc = (videoEl: HTMLVideoElement, videoUrl: string) => {
-  try {
-    const next = new URL(videoUrl).href;
-    if (videoEl.src !== next) {
-      videoEl.src = videoUrl;
-      videoEl.load();
-    }
-  } catch {
-    if (videoEl.getAttribute('src') !== videoUrl) {
-      videoEl.src = videoUrl;
-      videoEl.load();
-    }
+type PosterJob = () => Promise<void>;
+
+let activePosterJobs = 0;
+const posterQueue: PosterJob[] = [];
+
+const runPosterQueue = () => {
+  while (activePosterJobs < MAX_CONCURRENT_POSTERS && posterQueue.length > 0) {
+    const job = posterQueue.shift();
+    if (!job) return;
+    activePosterJobs += 1;
+    job()
+      .catch(() => undefined)
+      .finally(() => {
+        activePosterJobs -= 1;
+        runPosterQueue();
+      });
   }
 };
 
+const enqueuePosterJob = (job: PosterJob): void => {
+  posterQueue.push(job);
+  runPosterQueue();
+};
+
+const posterTimeForDuration = (duration: number): number => {
+  if (!Number.isFinite(duration) || duration <= 0) {
+    return POSTER_MIN_SECONDS;
+  }
+  const laterFrame = Math.max(POSTER_MIN_SECONDS, duration * 0.3);
+  return Math.min(laterFrame, Math.max(0.2, duration - 0.2));
+};
+
+const waitForEvent = (
+  videoEl: HTMLVideoElement,
+  eventName: string,
+  timeoutMs: number
+): Promise<boolean> =>
+  new Promise((resolve) => {
+    let settled = false;
+
+    const finish = (ok: boolean) => {
+      if (settled) return;
+      settled = true;
+      window.clearTimeout(timer);
+      videoEl.removeEventListener(eventName, onOk);
+      videoEl.removeEventListener('error', onErr);
+      resolve(ok);
+    };
+
+    const onOk = () => finish(true);
+    const onErr = () => finish(false);
+    const timer = window.setTimeout(() => finish(false), timeoutMs);
+
+    if (eventName === 'loadedmetadata' && videoEl.readyState >= 1) {
+      finish(true);
+      return;
+    }
+
+    videoEl.addEventListener(eventName, onOk, { once: true });
+    videoEl.addEventListener('error', onErr, { once: true });
+  });
+
+const seekTo = (videoEl: HTMLVideoElement, time: number): Promise<void> =>
+  new Promise((resolve) => {
+    if (videoEl.readyState < 1) {
+      resolve();
+      return;
+    }
+
+    const finish = () => {
+      window.clearTimeout(timer);
+      videoEl.removeEventListener('seeked', onSeeked);
+      resolve();
+    };
+
+    const onSeeked = () => finish();
+    const timer = window.setTimeout(finish, 4000);
+
+    videoEl.addEventListener('seeked', onSeeked, { once: true });
+    try {
+      videoEl.currentTime = time;
+    } catch {
+      finish();
+    }
+  });
+
 /**
- * When the card is on screen, play ~2s muted then pause on the last frame
- * so the card is never a blank box. Hover continues playback.
+ * Queue in-view cards and freeze a later frame. Timeouts never throw.
  */
 export const useCardVideoPreview = (videoUrl: string, isHoverPlaying: boolean) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const burstDoneRef = useRef(false);
+  const posterTimeRef = useRef(POSTER_MIN_SECONDS);
   const [inView, setInView] = useState(false);
   const [hasFrame, setHasFrame] = useState(false);
 
   useEffect(() => {
-    burstDoneRef.current = false;
     setHasFrame(false);
+    posterTimeRef.current = POSTER_MIN_SECONDS;
   }, [videoUrl]);
 
   useEffect(() => {
@@ -44,7 +115,7 @@ export const useCardVideoPreview = (videoUrl: string, isHoverPlaying: boolean) =
           observer.disconnect();
         }
       },
-      { rootMargin: '160px' }
+      { rootMargin: '200px' }
     );
     observer.observe(el);
     return () => observer.disconnect();
@@ -54,93 +125,78 @@ export const useCardVideoPreview = (videoUrl: string, isHoverPlaying: boolean) =
     const videoEl = videoRef.current;
     if (!videoEl || !videoUrl || !inView) return undefined;
 
-    assignVideoSrc(videoEl, videoUrl);
-    videoEl.muted = true;
-    videoEl.defaultMuted = true;
-    videoEl.playsInline = true;
-
     let cancelled = false;
-    let stopTimer: ReturnType<typeof setTimeout> | undefined;
 
-    const markFrame = () => {
-      if (!cancelled) {
-        setHasFrame(true);
-      }
-    };
+    const paintPoster = async () => {
+      if (cancelled) return;
 
-    const playBurstThenPause = () => {
-      if (cancelled || isHoverPlaying || burstDoneRef.current) {
-        markFrame();
-        return;
-      }
+      try {
+        videoEl.preload = 'metadata';
+        videoEl.muted = true;
+        videoEl.defaultMuted = true;
+        videoEl.playsInline = true;
 
-      const finishBurst = () => {
-        burstDoneRef.current = true;
-        if (!cancelled && !isHoverPlaying) {
+        if (videoEl.getAttribute('src') !== videoUrl && videoEl.src !== videoUrl) {
+          videoEl.src = videoUrl;
+          videoEl.load();
+        }
+
+        const ready = await waitForEvent(videoEl, 'loadedmetadata', 8000);
+        if (cancelled) return;
+
+        if (ready && videoEl.readyState >= 1) {
+          const time = posterTimeForDuration(videoEl.duration);
+          posterTimeRef.current = time;
+          await seekTo(videoEl, time);
+          if (cancelled) return;
           videoEl.pause();
         }
-      };
 
-      const playPromise = videoEl.play();
-      if (playPromise !== undefined) {
-        playPromise
-          .then(() => {
-            markFrame();
-            stopTimer = setTimeout(finishBurst, PREVIEW_PLAY_MS);
-          })
-          .catch(() => {
-            burstDoneRef.current = true;
-            markFrame();
-          });
-      } else {
-        markFrame();
-        stopTimer = setTimeout(finishBurst, PREVIEW_PLAY_MS);
+        if (!cancelled) {
+          setHasFrame(true);
+        }
+      } catch {
+        if (!cancelled) {
+          setHasFrame(true);
+        }
       }
     };
 
-    const onReady = () => {
-      markFrame();
-      if (isHoverPlaying) {
-        videoEl.play().catch(() => {});
-        return;
-      }
-      if (burstDoneRef.current) {
-        videoEl.pause();
-        return;
-      }
-      playBurstThenPause();
-    };
-
-    if (isHoverPlaying) {
-      if (stopTimer) {
-        clearTimeout(stopTimer);
-      }
-      markFrame();
-      if (videoEl.readyState >= 2) {
-        videoEl.play().catch(() => {});
-      } else {
-        videoEl.addEventListener('canplay', onReady, { once: true });
-      }
-    } else if (burstDoneRef.current) {
-      videoEl.pause();
-      markFrame();
-    } else if (videoEl.readyState >= 2) {
-      onReady();
-    } else {
-      videoEl.addEventListener('loadeddata', onReady, { once: true });
-      videoEl.addEventListener('canplay', onReady, { once: true });
-    }
-
-    videoEl.addEventListener('playing', markFrame);
+    enqueuePosterJob(paintPoster);
 
     return () => {
       cancelled = true;
-      if (stopTimer) {
-        clearTimeout(stopTimer);
-      }
-      videoEl.removeEventListener('playing', markFrame);
     };
-  }, [videoUrl, isHoverPlaying, inView]);
+  }, [videoUrl, inView]);
+
+  useEffect(() => {
+    const videoEl = videoRef.current;
+    if (!videoEl || !inView) return undefined;
+
+    if (isHoverPlaying) {
+      const playPreview = () => {
+        videoEl.currentTime = 0;
+        videoEl.play().catch(() => undefined);
+      };
+      if (videoEl.readyState >= 2) {
+        playPreview();
+      } else {
+        videoEl.addEventListener('canplay', playPreview, { once: true });
+        return () => videoEl.removeEventListener('canplay', playPreview);
+      }
+      return undefined;
+    }
+
+    videoEl.pause();
+    if (videoEl.readyState >= 1 && hasFrame) {
+      try {
+        videoEl.currentTime = posterTimeRef.current;
+      } catch {
+        /* keep last painted frame */
+      }
+    }
+    return undefined;
+  }, [isHoverPlaying, inView, hasFrame]);
 
   return { containerRef, videoRef, hasFrame };
 };

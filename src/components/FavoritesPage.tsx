@@ -19,7 +19,7 @@ interface FavoritePageCardProps {
 const FavoritePageCard: React.FC<FavoritePageCardProps> = ({ video, onVideoPlay, onRemove }) => {
   const [showVideo, setShowVideo] = useState(false);
   const videoUrl = video.video;
-  const { containerRef, videoRef } = useCardVideoPreview(videoUrl, showVideo);
+  const { containerRef, videoRef, hasFrame } = useCardVideoPreview(videoUrl, showVideo);
 
   const handleClick = () => {
     onVideoPlay?.({
@@ -43,11 +43,14 @@ const FavoritePageCard: React.FC<FavoritePageCardProps> = ({ video, onVideoPlay,
           muted
           playsInline
           loop
-          preload="auto"
+          preload="metadata"
           onError={() => {
             console.error('Favorite page video load error:', videoUrl);
           }}
         />
+        {!hasFrame && (
+          <div className="video-poster-fallback">{video.name}</div>
+        )}
         <button
           className="remove-favorite-btn"
           onClick={(e) => {

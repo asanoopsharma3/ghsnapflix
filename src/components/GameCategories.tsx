@@ -31,7 +31,7 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, onVideoPlay, onFavorite, i
   
   // Get video URL
   const videoUrl = video.video;
-  const { containerRef, videoRef } = useCardVideoPreview(videoUrl, isHovered && showVideo);
+  const { containerRef, videoRef, hasFrame } = useCardVideoPreview(videoUrl, isHovered && showVideo);
 
   const handleFavoriteClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -106,11 +106,14 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, onVideoPlay, onFavorite, i
           muted
           playsInline
           loop
-          preload="auto"
+          preload="metadata"
           onError={() => {
             console.error('Video load error:', videoUrl);
           }}
         />
+        {!hasFrame && (
+          <div className="video-poster-fallback">{video.name}</div>
+        )}
         <div className="video-overlay video-active">
           <div className="video-preview-badge">
             <span className="preview-dot"></span>

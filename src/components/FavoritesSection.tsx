@@ -18,7 +18,7 @@ interface FavoriteCardProps {
 const FavoriteCard: React.FC<FavoriteCardProps> = ({ video, onVideoPlay }) => {
   const [showVideo, setShowVideo] = useState(false);
   const videoUrl = video.video;
-  const { containerRef, videoRef } = useCardVideoPreview(videoUrl, showVideo);
+  const { containerRef, videoRef, hasFrame } = useCardVideoPreview(videoUrl, showVideo);
 
   const handleMouseEnter = () => {
     setShowVideo(true);
@@ -49,11 +49,14 @@ const FavoriteCard: React.FC<FavoriteCardProps> = ({ video, onVideoPlay }) => {
           muted
           playsInline
           loop
-          preload="auto"
+          preload="metadata"
           onError={() => {
             console.error('Favorite video load error:', videoUrl);
           }}
         />
+        {!hasFrame && (
+          <div className="video-poster-fallback">{video.name}</div>
+        )}
         <div className="favorite-overlay">
           <span className="favorite-badge">❤️ FAVORITE</span>
         </div>

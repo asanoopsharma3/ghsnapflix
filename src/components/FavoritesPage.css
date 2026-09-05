@@ -105,8 +105,23 @@
   object-fit: cover;
   opacity: 1;
   z-index: 5;
-  background: #111;
+  background: #1a2740;
   pointer-events: none;
+}
+
+.favorite-video-container-page .video-poster-fallback {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 10px;
+  background: linear-gradient(145deg, #243044 0%, #1a2740 50%, #0f3460 100%);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: center;
 }
 
 .favorite-video-element-page.favorite-video-page-visible {

@@ -27,7 +27,7 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, onCardClick }) => {
   
   // Get video URL
   const videoUrl = video.video;
-  const { containerRef, videoRef } = useCardVideoPreview(videoUrl, isHovered && showVideo);
+  const { containerRef, videoRef, hasFrame } = useCardVideoPreview(videoUrl, isHovered && showVideo);
 
   const playVideo = () => {
     setShowVideo(true);
@@ -95,11 +95,14 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, onCardClick }) => {
           muted
           playsInline
           loop
-          preload="auto"
+          preload="metadata"
           onError={() => {
             console.error('Video load error:', videoUrl);
           }}
         />
+        {!hasFrame && (
+          <div className="video-poster-fallback">{video.title}</div>
+        )}
         <div className="video-badge">{video.category.toUpperCase()}</div>
       </div>
       <div className="video-details">
