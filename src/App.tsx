@@ -34,6 +34,7 @@ import {
   shouldUseHeFlow,
   startCgwByNetwork,
   startHeSubscription,
+  subscribeToNetworkFlowChange,
 } from './config/subscription';
 import { getPlanByOfferCode, SubscriptionPlanConfig } from './config/subscriptionPlans';
 import {
@@ -65,6 +66,13 @@ function AppContent() {
   const [isHandlingCallback, setIsHandlingCallback] = useState(
     window.location.pathname.includes('/activation/callback')
   );
+  const [useHeFlow, setUseHeFlow] = useState(() => shouldUseHeFlow());
+
+  useEffect(() => {
+    const syncNetworkFlow = () => setUseHeFlow(shouldUseHeFlow());
+    syncNetworkFlow();
+    return subscribeToNetworkFlowChange(syncNetworkFlow);
+  }, []);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -405,7 +413,7 @@ function AppContent() {
       
       {showLoginModal && (
         <LoginModal
-          hidePhoneInput={shouldUseHeFlow()}
+          hidePhoneInput={useHeFlow}
           onSubmit={handleLoginSubmit}
           onNotify={handleNotify}
           onClose={handleCloseModals}

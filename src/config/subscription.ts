@@ -2,6 +2,8 @@ import { APP_CONFIG, getApiUrl, isDevelopmentEnv } from './appConfig';
 
 type NetworkInformation = {
   type?: string;
+  addEventListener?: (type: string, listener: () => void) => void;
+  removeEventListener?: (type: string, listener: () => void) => void;
 };
 
 type NavigatorWithConnection = Navigator & {
@@ -10,6 +12,15 @@ type NavigatorWithConnection = Navigator & {
   mozConnection?: NetworkInformation;
   webkitConnection?: NetworkInformation;
 };
+
+const getConnection = (): NetworkInformation | undefined => {
+  if (typeof navigator === 'undefined') return undefined;
+  const nav = navigator as NavigatorWithConnection;
+  return nav.connection || nav.mozConnection || nav.webkitConnection;
+};
+
+const getConnectionType = (): string =>
+  String(getConnection()?.type || '').toLowerCase();
 
 export const INITIAL_OFFER_CODE = APP_CONFIG.cgw.initialOfferCode;
 export const TOPUP_OFFER_CODE = APP_CONFIG.cgw.topupOfferCode;
@@ -21,6 +32,19 @@ export const HE_REDIRECT_URL = APP_CONFIG.cgw.heRedirectUrl;
 export const CGW_NHE_PORTAL_URL = APP_CONFIG.cgw.nhePortalStaging;
 
 export const FORCE_HE = isDevelopmentEnv() && APP_CONFIG.cgw.forceHe;
+
+/** Phone or laptop on WiFi / LAN → NHE (number field + Portal). */
+export const isWifiOrLanConnection = (): boolean => {
+  const connectionType = getConnectionType();
+  return (
+    connectionType === 'wifi' ||
+    connectionType === 'ethernet' ||
+    connectionType === 'bluetooth' ||
+    connectionType === 'mixed' ||
+    connectionType === 'other' ||
+    connectionType === 'none'
+  );
+};
 
 export const isMobileDevice = (): boolean => {
   if (typeof navigator === 'undefined' || typeof window === 'undefined') {
@@ -44,26 +68,39 @@ export const isMobileDevice = (): boolean => {
   return Boolean(window.matchMedia?.('(max-width: 729px)')?.matches);
 };
 
+/**
+ * HE = mobile data only.
+ * Phone + WiFi, laptop, or unknown connection → NHE (show number).
+ */
 export const isMobileNetworkCandidate = (): boolean => {
-  const nav = navigator as NavigatorWithConnection;
-  const connection = nav.connection || nav.mozConnection || nav.webkitConnection;
-  const connectionType = String(connection?.type || '').toLowerCase();
-
-  if (
-    connectionType === 'wifi' ||
-    connectionType === 'ethernet' ||
-    connectionType === 'bluetooth' ||
-    connectionType === 'mixed' ||
-    connectionType === 'other' ||
-    connectionType === 'none'
-  ) {
+  if (isWifiOrLanConnection()) {
     return false;
   }
-
-  return connectionType === 'cellular';
+  return getConnectionType() === 'cellular';
 };
 
-export const shouldUseHeFlow = (): boolean => FORCE_HE || isMobileNetworkCandidate();
+export const shouldUseHeFlow = (): boolean => {
+  if (FORCE_HE) return true;
+  if (isWifiOrLanConnection()) return false;
+  return isMobileNetworkCandidate();
+};
+
+export const subscribeToNetworkFlowChange = (onChange: () => void): (() => void) => {
+  if (typeof window === 'undefined') {
+    return () => undefined;
+  }
+
+  const connection = getConnection();
+  connection?.addEventListener?.('change', onChange);
+  window.addEventListener('online', onChange);
+  window.addEventListener('offline', onChange);
+
+  return () => {
+    connection?.removeEventListener?.('change', onChange);
+    window.removeEventListener('online', onChange);
+    window.removeEventListener('offline', onChange);
+  };
+};
 
 const cleanAbsoluteUrl = (url: string): string =>
   url.replace(/([^:]\/)\/+/g, '$1');

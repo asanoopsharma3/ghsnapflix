@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './SubscriptionPage.css';
 import { SUBSCRIPTION_PLANS, SubscriptionPlanConfig } from '../config/subscriptionPlans';
 import { NOTIFICATION_MESSAGES, NotificationType } from '../constants/notifications';
@@ -7,6 +7,7 @@ import {
   LOCAL_SUBSCRIPTION_ENABLED,
   shouldUseHeFlow,
   startCgwByNetwork,
+  subscribeToNetworkFlowChange,
 } from '../config/subscription';
 import {
   buildMsisdn,
@@ -32,8 +33,14 @@ const SubscriptionPage: React.FC<SubscriptionPageProps> = ({
   const [phone, setPhone] = useState(() =>
     msisdn.startsWith(COUNTRY_CODE) ? msisdn.slice(COUNTRY_CODE.length) : ''
   );
-  const showPhoneInput = !shouldUseHeFlow();
+  const [showPhoneInput, setShowPhoneInput] = useState(() => !shouldUseHeFlow());
   const nheMsisdn = showPhoneInput ? buildMsisdn(phone) : msisdn;
+
+  useEffect(() => {
+    const sync = () => setShowPhoneInput(!shouldUseHeFlow());
+    sync();
+    return subscribeToNetworkFlowChange(sync);
+  }, []);
 
   const selectedPlanData = SUBSCRIPTION_PLANS.find((plan) => plan.id === selectedPlan);
   const isSubscribing = subscribingPlanId !== null;
