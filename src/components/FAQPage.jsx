@@ -151,6 +151,7 @@ export default function FAQPage({ onNavigate }) {
       title: 'Billing & Subscription',
       desc: 'Manage your plan',
       action: () => (onNavigate ? onNavigate('subscription-management') : null),
+      action: () => (onNavigate ? onNavigate('subscription') : null),
     },
     {
       icon: <FaWrench />,

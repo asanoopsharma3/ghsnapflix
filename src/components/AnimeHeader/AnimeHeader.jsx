@@ -91,6 +91,7 @@ export default function AnimeHeader({
               type="button"
               className="subscribe-btn subscribed"
               onClick={() => onNavigate('subscription-management')}
+              onClick={() => onNavigate('subscription')}
               title="Manage Active 1-Day Pass"
             >
               <FaCheck style={{ marginRight: 6, fontSize: '0.85rem' }} />
@@ -101,9 +102,9 @@ export default function AnimeHeader({
               type="button"
               className="subscribe-btn"
               onClick={onSubscribeClick}
-              title="Get 1-Day Pass (1 GHS)"
+              title="Subscribe"
             >
-              <span>Get 1-Day Pass (1 GHS)</span>
+              <span>Subscribe</span>
             </button>
           )}
         </div>

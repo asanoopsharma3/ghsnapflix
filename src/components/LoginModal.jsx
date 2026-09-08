@@ -1,88 +1,138 @@
 import React, { useState } from 'react';
-import './LoginModal.css';
+import './LoginModal.scss';
 import { useTranslation } from '../contexts/TranslationContext';
 import { NOTIFICATION_MESSAGES } from '../constants/notifications';
-import { buildMsisdn, COUNTRY_CODE, isValidLocalPhoneInput, PHONE_INPUT_MAX_LENGTH, sanitizeLocalPhoneInput, } from '../constants/phone';
-import { FaLock } from 'react-icons/fa6';
-const LoginModal = ({ hidePhoneInput = false, onSubmit, onNotify, onClose, }) => {
-    const { t } = useTranslation();
-    const [phone, setPhone] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
-    const handlePhoneChange = (e) => {
-        setPhone(sanitizeLocalPhoneInput(e.target.value));
-    };
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        if (!hidePhoneInput && !isValidLocalPhoneInput(phone)) {
-            return;
-        }
-        const msisdn = hidePhoneInput ? '' : buildMsisdn(phone);
-        setIsLoading(true);
-        try {
-            await onSubmit(msisdn);
-        }
-        catch {
-            onNotify(NOTIFICATION_MESSAGES.ERROR_GENERIC, 'error');
-        }
-        finally {
-            setIsLoading(false);
-        }
-    };
-    const isSubmitDisabled = isLoading || (!hidePhoneInput && !isValidLocalPhoneInput(phone));
-    return (<div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <button className="close-button" onClick={onClose} type="button">
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-            <path d="M15 5L5 15M5 5L15 15" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-          </svg>
+import {
+  buildMsisdn,
+  COUNTRY_CODE,
+  isValidLocalPhoneInput,
+  PHONE_INPUT_MAX_LENGTH,
+  sanitizeLocalPhoneInput,
+} from '../constants/phone';
+import { FaShieldHalved, FaXmark, FaArrowRight, FaPlay } from 'react-icons/fa6';
+
+const LoginModal = ({ hidePhoneInput = false, onSubmit, onNotify, onClose }) => {
+  const { t } = useTranslation();
+  const [phone, setPhone] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handlePhoneChange = (e) => {
+    setPhone(sanitizeLocalPhoneInput(e.target.value));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!hidePhoneInput && !isValidLocalPhoneInput(phone)) {
+      return;
+    }
+    const msisdn = hidePhoneInput ? '' : buildMsisdn(phone);
+    setIsLoading(true);
+    try {
+      await onSubmit(msisdn);
+    } catch {
+      onNotify(NOTIFICATION_MESSAGES.ERROR_GENERIC, 'error');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const isSubmitDisabled = isLoading || (!hidePhoneInput && !isValidLocalPhoneInput(phone));
+
+  return (
+    <div className="login-modal-backdrop" onClick={onClose}>
+      <div className="login-modal-card" onClick={(e) => e.stopPropagation()}>
+        {/* Top Glow Ambient */}
+        <div className="modal-glow-ambient" />
+
+        {/* Close Button */}
+        <button
+          className="modal-close-btn"
+          onClick={onClose}
+          type="button"
+          aria-label="Close modal"
+        >
+          <FaXmark />
         </button>
 
-        <div className="modal-header">
-          <div className="modal-logo-custom">
-            <div className="modal-play-icon" style={{ background: '#f5c518', width: 44, height: 44, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px' }}>
-              <svg viewBox="0 0 24 24" width="22" height="22" fill="#0c0d12" style={{ marginLeft: 2 }}>
-                <path d="M8 5v14l11-7z" />
-              </svg>
+        {/* Header with Brand Logo & Title */}
+        <div className="modal-header-section">
+          <div className="brand-badge-row">
+            <div className="brand-logo-icon">
+              <FaPlay className="play-triangle" />
             </div>
-            <div className="modal-logo-text" style={{ textAlign: 'center', marginBottom: 6 }}>
-              <span style={{ color: '#f5c518', fontSize: '1.4rem', fontWeight: 900, letterSpacing: '0.5px' }}>GHSNAPFLIX</span>
+            <div className="brand-meta">
+              <span className="brand-name">GHSNAPFLIX</span>
+              <span className="brand-tagline">WATCH • STREAM • EXPLORE</span>
             </div>
           </div>
-          <h1 className="modal-title">{t('login.welcome')}</h1>
+
+          <h2 className="modal-title">{t('login.welcome')}</h2>
+          <p className="modal-subtitle">
+            Unlimited anime clips, AMVs & exclusive edits on MTN Ghana
+          </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="modal-form">
-          {!hidePhoneInput && (<div className="input-group">
-              <label className="input-label">{t('login.phone.label')}</label>
-              <div className="phone-input-wrapper">
-                <span className="phone-prefix">+{COUNTRY_CODE}</span>
-                <input type="tel" inputMode="numeric" value={phone} onChange={handlePhoneChange} className="phone-input" placeholder="241234567" maxLength={PHONE_INPUT_MAX_LENGTH} disabled={isLoading} autoComplete="tel-national"/>
+        {/* Form Section */}
+        <form onSubmit={handleSubmit} className="modal-form-section">
+          {!hidePhoneInput && (
+            <div className="phone-field-group">
+              <label htmlFor="modal-phone-input" className="field-label">
+                {t('login.phone.label')}
+              </label>
+              <div className="phone-input-box">
+                <div className="country-prefix">
+                  <span className="flag-icon" role="img" aria-label="Ghana Flag">
+                    🇬🇭
+                  </span>
+                  <span className="prefix-num">+{COUNTRY_CODE}</span>
+                </div>
+                <input
+                  id="modal-phone-input"
+                  type="tel"
+                  inputMode="numeric"
+                  value={phone}
+                  onChange={handlePhoneChange}
+                  className="phone-native-input"
+                  placeholder="241234567"
+                  maxLength={PHONE_INPUT_MAX_LENGTH}
+                  disabled={isLoading}
+                  autoComplete="tel-national"
+                  autoFocus
+                />
               </div>
-            </div>)}
+              <span className="field-hint">Enter your 9-digit MTN mobile number</span>
+            </div>
+          )}
 
-          <button type="submit" className={`send-otp-button ${isLoading ? 'loading' : ''}`} disabled={isSubmitDisabled} style={{
-            background: 'linear-gradient(135deg, #ffd21f 0%, #f5c518 100%)',
-            color: '#0c0d12',
-            fontWeight: 800,
-            opacity: isSubmitDisabled ? 0.6 : 1,
-        }}>
-            {isLoading ? (<>
-                <span className="button-spinner" aria-hidden="true"/>
+          <button
+            type="submit"
+            className={`modal-submit-btn ${isLoading ? 'is-loading' : ''}`}
+            disabled={isSubmitDisabled}
+          >
+            {isLoading ? (
+              <>
+                <span className="submit-spinner" aria-hidden="true" />
                 <span>Please wait...</span>
-              </>) : (<>
-                <span>{t('login.proceed.subscribe')}</span>
-                <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
-                  <path d="M4 10L16 10M10 4L16 10L10 16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              </>)}
+              </>
+            ) : (
+              <span>Subscribe</span>
+            )}
           </button>
         </form>
 
-        <div className="security-notice">
-          <div className="security-icon"><FaLock /></div>
-          <span>{t('login.security')}</span>
+        {/* Security & Billing Trust Bar */}
+        <div className="trust-security-bar">
+          <div className="trust-icon">
+            <FaShieldHalved />
+          </div>
+          <div className="trust-text">
+            <span>{t('login.security')}</span>
+            <span className="trust-badge">MTN Verified Partner</span>
+          </div>
         </div>
       </div>
-    </div>);
+    </div>
+  );
 };
+
 export default LoginModal;

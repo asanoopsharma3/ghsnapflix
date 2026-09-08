@@ -78,6 +78,9 @@ function AppContent() {
   const [currentPage, setCurrentPage] = useState(() => {
     try {
       const p = new URLSearchParams(window.location.search).get('page');
+      if (p === 'unsubscribe' || p === 'subscription-management') {
+        return 'subscription';
+      }
       return p || 'home';
     } catch {
       return 'home';
@@ -470,11 +473,16 @@ function AppContent() {
         });
         return;
       }
+    if (page === 'unsubscribe' || page === 'subscription-management') {
+      setCurrentPage('subscription');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
     }
 
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [handleSubscribeEntry]);
+  }, []);
 
   const handleCloseNotification = useCallback(() => {
     setNotification(null);
@@ -492,8 +500,10 @@ function AppContent() {
         return (
           <SubscriptionPage
             msisdn={phoneNumber}
+            isSubscribed={isSubscribed}
             onSubscribeSuccess={handleSubscribeSuccess}
             onNotify={handleNotify}
+            onNavigate={handleNavigate}
           />
         );
       case 'news':

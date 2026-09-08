@@ -12,6 +12,8 @@
 html {
   scroll-behavior: smooth;
   background-color: $bg-canvas;
+  overflow-x: hidden;
+  max-width: 100%;
 }
 
 body {
