@@ -12,9 +12,20 @@ export const HE_MOBILE_NUMBER = APP_CONFIG.cgw.heFixedMobileNumber;
 export const CGW_BACKEND_CALLBACK_URL = APP_CONFIG.cgw.callbackUrl;
 export const CGW_ENV = APP_CONFIG.cgw.env;
 export const HE_REDIRECT_URL = APP_CONFIG.cgw.heRedirectUrl;
-/** NHE always uses SIT Portal. HE never uses this URL. */
-export const CGW_NHE_PORTAL_URL = APP_CONFIG.cgw.nhePortalStaging;
+/** NHE uses staging or production Portal from CGW_ENV. HE never uses this URL. */
+export const CGW_NHE_PORTAL_URL = String(APP_CONFIG.cgw.nonHeBaseUrl || APP_CONFIG.cgw.nhePortalStaging).replace(/\/+$/, '');
 export const FORCE_HE = isDevelopmentEnv() && APP_CONFIG.cgw.forceHe;
+/** iOS Safari has no Network Information API; HTTP HE Redirect is also unreliable there. */
+export const isIOSDevice = () => {
+    if (typeof navigator === 'undefined') {
+        return false;
+    }
+    const ua = navigator.userAgent || '';
+    if (/iPad|iPhone|iPod/i.test(ua)) {
+        return true;
+    }
+    return navigator.platform === 'MacIntel' && Number(navigator.maxTouchPoints || 0) > 1;
+};
 /** WiFi / Ethernet only — phone on WiFi is NHE. Do not treat "other" as WiFi. */
 export const isWifiOrLanConnection = () => {
     const connectionType = getConnectionType();
@@ -35,11 +46,11 @@ export const isMobileDevice = () => {
     return Boolean(window.matchMedia?.('(max-width: 729px)')?.matches);
 };
 /**
- * HE: cellular / mobile data (or phone when type is unknown).
- * NHE: WiFi / Ethernet / desktop.
+ * HE: Android cellular / mobile data (or Android phone when type is unknown).
+ * NHE: WiFi / Ethernet / desktop / all iOS (Safari cannot report wifi vs cellular).
  */
 export const isMobileNetworkCandidate = () => {
-    if (isWifiOrLanConnection()) {
+    if (isIOSDevice() || isWifiOrLanConnection()) {
         return false;
     }
     const connectionType = getConnectionType();
@@ -52,7 +63,7 @@ export const shouldUseHeFlow = () => {
     if (FORCE_HE) {
         return true;
     }
-    if (isWifiOrLanConnection()) {
+    if (isIOSDevice() || isWifiOrLanConnection()) {
         return false;
     }
     return isMobileNetworkCandidate();
@@ -116,12 +127,31 @@ export const startCgwByNetwork = (msisdn, offerCode = INITIAL_OFFER_CODE) => {
 export const startNheSubscription = (msisdn, offerCode = INITIAL_OFFER_CODE) => {
     const callbackUrl = new URL(cleanAbsoluteUrl(CGW_BACKEND_CALLBACK_URL));
     callbackUrl.searchParams.set('flow', 'NHE');
-    const params = new URLSearchParams({
+    const fields = {
         OfferCode: offerCode,
         redirectUrl: callbackUrl.toString(),
         mobileNumber: normalizeGhanaMsisdn(msisdn),
-    });
-    window.location.href = `${CGW_NHE_PORTAL_URL}?${params.toString()}`;
+    };
+    const portalUrl = CGW_NHE_PORTAL_URL;
+    if (typeof document !== 'undefined') {
+        const form = document.createElement('form');
+        form.method = 'GET';
+        form.action = portalUrl;
+        form.acceptCharset = 'UTF-8';
+        form.style.display = 'none';
+        Object.entries(fields).forEach(([name, value]) => {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = name;
+            input.value = value;
+            form.appendChild(input);
+        });
+        document.body.appendChild(form);
+        form.submit();
+        return;
+    }
+    const params = new URLSearchParams(fields);
+    window.location.assign(`${portalUrl}?${params.toString()}`);
 };
 export const LOCAL_SUBSCRIPTION_ENABLED = isDevelopmentEnv() && !FORCE_HE && APP_CONFIG.cgw.localSubscription;
 export const activateLocalSubscription = async (msisdn, offerCode = INITIAL_OFFER_CODE) => {

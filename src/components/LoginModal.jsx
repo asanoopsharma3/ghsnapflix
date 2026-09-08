@@ -62,7 +62,7 @@ const LoginModal = ({ hidePhoneInput = false, onSubmit, onNotify, onClose, }) =>
               <label className="input-label">{t('login.phone.label')}</label>
               <div className="phone-input-wrapper">
                 <span className="phone-prefix">+{COUNTRY_CODE}</span>
-                <input type="tel" inputMode="numeric" value={phone} onChange={handlePhoneChange} className="phone-input" placeholder="241234567" maxLength={PHONE_INPUT_MAX_LENGTH} disabled={isLoading} autoComplete="tel-national"/>
+                <input type="tel" inputMode="numeric" name="mobileNumber" value={phone} onChange={handlePhoneChange} className="phone-input" placeholder="241234567" maxLength={PHONE_INPUT_MAX_LENGTH} disabled={isLoading} autoComplete="tel-national" autoCapitalize="off" autoCorrect="off" spellCheck={false}/>
               </div>
             </div>)}
 
