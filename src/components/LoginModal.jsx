@@ -53,6 +53,8 @@ const LoginModal = ({ hidePhoneInput = false, onSubmit, onNotify, onClose, }) =>
         <div className="modal-body">
         <div className="modal-header">
           <h1 className="modal-title">{t('login.welcome')}</h1>
+          <p className="modal-pack-name">Snapflix daily</p>
+          <p className="modal-price">1 GHC per day · GHC 1.00 Daily</p>
         </div>
 
         <form onSubmit={handleSubmit} className="modal-form">
@@ -68,12 +70,10 @@ const LoginModal = ({ hidePhoneInput = false, onSubmit, onNotify, onClose, }) =>
             {isLoading ? (<>
                 <span className="button-spinner" aria-hidden="true"/>
                 <span>Please wait...</span>
-              </>) : (<>
-                <span>{t('login.proceed.subscribe')}</span>
-                <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
-                  <path d="M4 10L16 10M10 4L16 10L10 16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              </>)}
+              </>) : (<span className="send-otp-button-copy">
+                <span className="send-otp-button-title">{t('login.proceed.subscribe')}</span>
+                <span className="send-otp-button-price">GHC 1.00 per day or GHC 1.00 Daily</span>
+              </span>)}
           </button>
         </form>
 

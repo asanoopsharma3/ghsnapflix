@@ -270,6 +270,22 @@
   background: none !important;
 }
 
+.modal-pack-name {
+  margin: 8px 0 0;
+  color: #ffc107;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+
+.modal-price {
+  margin: 6px 0 0;
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 15px;
+  font-weight: 700;
+}
+
 .modal-subtitle {
   color: rgba(255, 255, 255, 0.7);
   font-size: 13px;
@@ -462,7 +478,7 @@
 
 .modal-content .send-otp-button {
   width: 100% !important;
-  padding: 15px 24px !important;
+  padding: 14px 18px !important;
   background: #0c0d12 !important;
   color: #ffffff !important;
   border: none !important;
@@ -472,12 +488,33 @@
   cursor: pointer !important;
   transition: all 0.25s ease !important;
   display: flex !important;
+  flex-direction: column !important;
   align-items: center !important;
   justify-content: center !important;
-  gap: 8px !important;
+  gap: 4px !important;
   position: relative !important;
   overflow: hidden !important;
   box-shadow: 0 8px 22px rgba(0, 0, 0, 0.35) !important;
+}
+
+.send-otp-button-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  line-height: 1.2;
+}
+
+.send-otp-button-title {
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.send-otp-button-price {
+  font-size: 12px;
+  font-weight: 700;
+  color: #ffc107;
+  letter-spacing: 0.2px;
 }
 
 .send-otp-button::before {
