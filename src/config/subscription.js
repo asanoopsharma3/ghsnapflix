@@ -15,15 +15,10 @@ export const HE_REDIRECT_URL = APP_CONFIG.cgw.heRedirectUrl;
 /** NHE always uses SIT Portal. HE never uses this URL. */
 export const CGW_NHE_PORTAL_URL = APP_CONFIG.cgw.nhePortalStaging;
 export const FORCE_HE = isDevelopmentEnv() && APP_CONFIG.cgw.forceHe;
-/** Phone or laptop on WiFi / LAN → NHE (number field + Portal). */
+/** WiFi / Ethernet only — phone on WiFi is NHE. Do not treat "other" as WiFi. */
 export const isWifiOrLanConnection = () => {
     const connectionType = getConnectionType();
-    return (connectionType === 'wifi' ||
-        connectionType === 'ethernet' ||
-        connectionType === 'bluetooth' ||
-        connectionType === 'mixed' ||
-        connectionType === 'other' ||
-        connectionType === 'none');
+    return connectionType === 'wifi' || connectionType === 'ethernet';
 };
 export const isMobileDevice = () => {
     if (typeof navigator === 'undefined' || typeof window === 'undefined') {
@@ -40,20 +35,26 @@ export const isMobileDevice = () => {
     return Boolean(window.matchMedia?.('(max-width: 729px)')?.matches);
 };
 /**
- * HE = mobile data only.
- * Phone + WiFi, laptop, or unknown connection → NHE (show number).
+ * HE: cellular / mobile data (or phone when type is unknown).
+ * NHE: WiFi / Ethernet / desktop.
  */
 export const isMobileNetworkCandidate = () => {
     if (isWifiOrLanConnection()) {
         return false;
     }
-    return getConnectionType() === 'cellular';
+    const connectionType = getConnectionType();
+    if (connectionType === 'cellular' || connectionType === 'wimax') {
+        return true;
+    }
+    return isMobileDevice();
 };
 export const shouldUseHeFlow = () => {
-    if (FORCE_HE)
+    if (FORCE_HE) {
         return true;
-    if (isWifiOrLanConnection())
+    }
+    if (isWifiOrLanConnection()) {
         return false;
+    }
     return isMobileNetworkCandidate();
 };
 export const subscribeToNetworkFlowChange = (onChange) => {
@@ -99,7 +100,8 @@ export const getHeRedirectParams = (offerCode = INITIAL_OFFER_CODE) => {
 export const startHeSubscription = (offerCode = INITIAL_OFFER_CODE) => {
     localStorage.setItem('offerCode', offerCode);
     const params = new URLSearchParams(getHeRedirectParams(offerCode));
-    window.location.replace(`${HE_REDIRECT_URL}?${params.toString()}`);
+    const heUrl = `${String(HE_REDIRECT_URL).replace(/\/+$/, '')}?${params.toString()}`;
+    window.location.href = heUrl;
 };
 /** HE → IP Redirect. NHE → sitcgw Portal. */
 export const startCgwByNetwork = (msisdn, offerCode = INITIAL_OFFER_CODE) => {
