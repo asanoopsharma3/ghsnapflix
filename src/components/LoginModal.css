@@ -24,20 +24,106 @@
 }
 
 .modal-content {
-  background: #2d2d2d !important;
-  border-radius: 16px;
-  padding: 50px 35px 35px 35px;
+  background: #0c0d12 !important;
+  border-radius: 20px;
+  padding: 0;
   width: 100%;
   max-width: 420px;
   position: relative;
-  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 28px 60px rgba(0, 0, 0, 0.55);
   animation: none !important;
-  border: 1px solid #555;
+  border: none;
   margin: 0 auto;
+  overflow: hidden;
 }
 
-.modal-content * {
-  background: inherit !important;
+.modal-brand-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: #ffc107;
+  padding: 16px 18px 16px 20px;
+}
+
+.modal-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.modal-brand-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #0c0d12;
+  color: #ffc107;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.22);
+}
+
+.modal-brand-icon svg {
+  margin-left: 2px;
+}
+
+.modal-brand-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-brand-name {
+  font-size: 1.15rem;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+  color: #0c0d12;
+  line-height: 1.1;
+}
+
+.modal-brand-tagline {
+  font-size: 0.55rem;
+  font-weight: 800;
+  letter-spacing: 1.4px;
+  color: rgba(12, 13, 18, 0.72);
+  text-transform: uppercase;
+}
+
+.modal-body {
+  padding: 28px 28px 26px;
+}
+
+.close-button {
+  position: static;
+  background: rgba(12, 13, 18, 0.12);
+  border: none;
+  color: #0c0d12;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  box-shadow: none;
+}
+
+.close-button:hover {
+  background: #0c0d12;
+  border-color: transparent;
+  color: #ffc107;
+  transform: none;
+}
+
+.modal-content .modal-play-icon,
+.modal-content .modal-play-svg,
+.modal-content .modal-play-circle,
+.modal-content .modal-play-triangle,
+.modal-content .modal-play-ring {
+  background: none !important;
 }
 
 .modal-content .gradient-blue,
@@ -59,7 +145,7 @@
   visibility: visible !important;
   opacity: 1 !important;
   display: inline-block !important;
-  background: linear-gradient(135deg, #0d9488 0%, #14b8a6 100%) !important;
+  background: linear-gradient(135deg, #0c0d12 0%, #1a1c24 100%) !important;
   -webkit-background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
   background-clip: text !important;
@@ -69,7 +155,7 @@
   visibility: visible !important;
   opacity: 1 !important;
   display: inline-block !important;
-  background: linear-gradient(135deg, #14b8a6 0%, #facc15 100%) !important;
+  background: linear-gradient(135deg, #ffc107 0%, #fbc02d 100%) !important;
   -webkit-background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
   background-clip: text !important;
@@ -102,46 +188,18 @@
   }
 }
 
-.close-button {
-  position: absolute;
-  top: 15px;
-  right: 15px;
-  background: rgba(0, 0, 0, 0.8);
-  border: 2px solid rgba(255, 255, 255, 0.5);
-  color: white;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(5px);
-  font-size: 18px;
-  font-weight: bold;
-  z-index: 10001;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  flex-shrink: 0;
-}
-
-.close-button:hover {
-  background: rgba(13, 148, 136, 0.8);
-  border-color: #0d9488;
-  color: white;
-  transform: scale(1.1);
-}
-
 .modal-header {
   text-align: center;
-  margin-bottom: 30px;
+  margin: 0 0 16px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   width: 100%;
   position: relative;
-  padding-top: 0;
+  padding: 0;
+  background: transparent;
+  border-radius: 0;
 }
 
 /* Custom Modal Logo Styling */
@@ -184,12 +242,12 @@
   font-weight: 900;
   letter-spacing: 2px;
   display: inline-block;
-  color: #5eead4 !important;
+  color: #ffc107 !important;
 }
 
 .modal-text-snap {
   margin-right: 2px;
-  color: #5eead4 !important;
+  color: #ffc107 !important;
 }
 
 .modal-text-flix {
@@ -203,12 +261,13 @@
 /* Remove old logo styles */
 
 .modal-title {
-  color: white;
-  font-size: 28px;
-  font-weight: 700;
-  margin: 0 0 20px 0;
+  color: #ffffff !important;
+  font-size: 22px;
+  font-weight: 800;
+  margin: 0;
   text-align: center;
-  white-space: nowrap;
+  white-space: normal;
+  background: none !important;
 }
 
 .modal-subtitle {
@@ -269,9 +328,9 @@
 }
 
 .phone-input-wrapper:focus-within {
-  border-color: #0d9488;
+  border-color: #ffc107;
   background: rgba(255, 255, 255, 0.08);
-  box-shadow: 0 0 0 4px rgba(13, 148, 136, 0.1);
+  box-shadow: 0 0 0 4px rgba(255, 193, 7, 0.18);
 }
 
 .phone-prefix {
@@ -393,7 +452,7 @@
 }
 
 .terms-link {
-  color: #0d9488;
+  color: #ffc107;
   text-decoration: none;
 }
 
@@ -403,22 +462,22 @@
 
 .modal-content .send-otp-button {
   width: 100% !important;
-  padding: 16px 24px !important;
-  background: linear-gradient(135deg, #5eead4 0%, #14b8a6 55%, #0f766e 100%) !important;
-  color: white !important;
+  padding: 15px 24px !important;
+  background: #0c0d12 !important;
+  color: #ffffff !important;
   border: none !important;
   border-radius: 12px !important;
   font-size: 16px !important;
-  font-weight: 600 !important;
+  font-weight: 800 !important;
   cursor: pointer !important;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  transition: all 0.25s ease !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
   gap: 8px !important;
   position: relative !important;
   overflow: hidden !important;
-  box-shadow: 0 4px 15px rgba(13, 148, 136, 0.3) !important;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.35) !important;
 }
 
 .send-otp-button::before {
@@ -437,9 +496,9 @@
 }
 
 .modal-content .send-otp-button:hover:not(:disabled) {
-  background: linear-gradient(135deg, #0f766e 0%, #115e59 100%) !important;
-  transform: translateY(-2px) !important;
-  box-shadow: 0 8px 25px rgba(13, 148, 136, 0.4) !important;
+  background: #1a1c24 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.4) !important;
 }
 
 .send-otp-button:active {
@@ -448,11 +507,11 @@
 }
 
 .modal-content .send-otp-button:disabled {
-  background: linear-gradient(135deg, #5eead4 0%, #14b8a6 55%, #0f766e 100%) !important;
+  background: #2a2d36 !important;
   cursor: not-allowed !important;
   transform: none !important;
-  box-shadow: 0 4px 15px rgba(13, 148, 136, 0.2) !important;
-  opacity: 0.6 !important;
+  box-shadow: none !important;
+  opacity: 0.55 !important;
 }
 
 .security-notice {
@@ -460,13 +519,13 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.62);
   font-size: 12px;
-  margin: 10px 0;
-  padding: 8px 12px;
-  background: rgba(34, 197, 94, 0.1);
-  border: 1px solid rgba(34, 197, 94, 0.2);
-  border-radius: 8px;
+  margin: 12px 0 0;
+  padding: 10px 12px;
+  background: rgba(255, 193, 7, 0.08);
+  border: 1px solid rgba(255, 193, 7, 0.22);
+  border-radius: 10px;
 }
 
 .security-icon {
@@ -528,7 +587,7 @@
 
 .social-btn:hover {
   background: rgba(13, 148, 136, 0.2);
-  border-color: #0d9488;
+  border-color: #ffc107;
   transform: translateY(-3px);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
 }
@@ -544,7 +603,7 @@
   }
   
   .modal-content {
-    padding: 30px;
+    padding: 0;
     max-width: 95%;
   }
   
@@ -582,7 +641,7 @@
   }
   
   .modal-content {
-    padding: 30px;
+    padding: 0;
   }
   
   .modal-title {
@@ -598,16 +657,6 @@
   .modal-play-icon {
     width: 32px !important;
     height: 32px !important;
-  }
-
-  .modal-text-snap,
-  .modal-text-flix {
-    font-size: 16px !important;
-    letter-spacing: 1px !important;
-  }
-  
-  .modal-content {
-    padding-top: 50px;
   }
   
   .phone-input {
@@ -666,7 +715,7 @@
 }
 
 .highlight {
-  color: #0d9488;
+  color: #ffc107;
   font-weight: 600;
 }
 
@@ -697,13 +746,18 @@
 }
 
 /* Force red button override - highest specificity */
+.modal-content .modal-header {
+  background: transparent !important;
+}
+
 .modal-content .modal-form .send-otp-button {
-  background: linear-gradient(135deg, #5eead4 0%, #14b8a6 55%, #0f766e 100%) !important;
-  color: white !important;
+  background: #0c0d12 !important;
+  color: #ffffff !important;
   border: none !important;
+  border-radius: 12px !important;
 }
 
 .modal-content .modal-form .send-otp-button:disabled {
-  background: linear-gradient(135deg, #5eead4 0%, #14b8a6 55%, #0f766e 100%) !important;
-  opacity: 0.6 !important;
+  background: #2a2d36 !important;
+  opacity: 0.55 !important;
 }

@@ -20,10 +20,10 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "dev": "vite",
-    "start": "vite",
-    "build": "vite build",
-    "preview": "vite preview",
+    "dev": "npx vite",
+    "start": "npx vite",
+    "build": "npx vite build",
+    "preview": "npx vite preview",
     "start:cra": "react-scripts start",
     "build:cra": "react-scripts build",
     "test": "react-scripts test",

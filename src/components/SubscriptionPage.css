@@ -671,12 +671,12 @@
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.modal-header {
+.payment-modal .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 24px 32px;
-  background: linear-gradient(135deg, #1e40af, #3b82f6);
+  background: linear-gradient(135deg, #0c0d12, #1a1c24);
   border-radius: 24px 24px 0 0;
   position: relative;
   overflow: hidden;
@@ -1115,7 +1115,7 @@
     border-radius: 16px;
   }
 
-  .modal-header {
+  .payment-modal .modal-header {
     padding: 20px 24px;
     border-radius: 16px 16px 0 0;
   }
@@ -1167,7 +1167,7 @@
     border-radius: 12px;
   }
 
-  .modal-header {
+  .payment-modal .modal-header {
     padding: 16px 20px;
     border-radius: 12px 12px 0 0;
   }

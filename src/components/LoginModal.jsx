@@ -31,23 +31,27 @@ const LoginModal = ({ hidePhoneInput = false, onSubmit, onNotify, onClose, }) =>
     const isSubmitDisabled = isLoading || (!hidePhoneInput && !isValidLocalPhoneInput(phone));
     return (<div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <button className="close-button" onClick={onClose} type="button">
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-            <path d="M15 5L5 15M5 5L15 15" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-          </svg>
-        </button>
-
-        <div className="modal-header">
-          <div className="modal-logo-custom">
-            <div className="modal-play-icon" style={{ background: '#f5c518', width: 44, height: 44, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px' }}>
-              <svg viewBox="0 0 24 24" width="22" height="22" fill="#0c0d12" style={{ marginLeft: 2 }}>
+        <div className="modal-brand-bar">
+          <div className="modal-brand">
+            <span className="modal-brand-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
                 <path d="M8 5v14l11-7z" />
               </svg>
-            </div>
-            <div className="modal-logo-text" style={{ textAlign: 'center', marginBottom: 6 }}>
-              <span style={{ color: '#f5c518', fontSize: '1.4rem', fontWeight: 900, letterSpacing: '0.5px' }}>GHSNAPFLIX</span>
+            </span>
+            <div className="modal-brand-text">
+              <span className="modal-brand-name">GHSNAPFLIX</span>
+              <span className="modal-brand-tagline">WATCH • STREAM • EXPLORE</span>
             </div>
           </div>
+          <button className="close-button" onClick={onClose} type="button" aria-label="Close">
+            <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+              <path d="M15 5L5 15M5 5L15 15" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"/>
+            </svg>
+          </button>
+        </div>
+
+        <div className="modal-body">
+        <div className="modal-header">
           <h1 className="modal-title">{t('login.welcome')}</h1>
         </div>
 
@@ -60,12 +64,7 @@ const LoginModal = ({ hidePhoneInput = false, onSubmit, onNotify, onClose, }) =>
               </div>
             </div>)}
 
-          <button type="submit" className={`send-otp-button ${isLoading ? 'loading' : ''}`} disabled={isSubmitDisabled} style={{
-            background: 'linear-gradient(135deg, #ffd21f 0%, #f5c518 100%)',
-            color: '#0c0d12',
-            fontWeight: 800,
-            opacity: isSubmitDisabled ? 0.6 : 1,
-        }}>
+          <button type="submit" className={`send-otp-button ${isLoading ? 'loading' : ''}`} disabled={isSubmitDisabled}>
             {isLoading ? (<>
                 <span className="button-spinner" aria-hidden="true"/>
                 <span>Please wait...</span>
@@ -81,6 +80,7 @@ const LoginModal = ({ hidePhoneInput = false, onSubmit, onNotify, onClose, }) =>
         <div className="security-notice">
           <div className="security-icon"><FaLock /></div>
           <span>{t('login.security')}</span>
+        </div>
         </div>
       </div>
     </div>);

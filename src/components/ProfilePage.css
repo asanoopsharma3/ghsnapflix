@@ -1,7 +1,7 @@
 /* ==========================================================================
    GHSNAPFLIX Profile / Account Page Styles
    Design System:
-   Primary: #FFD21F | Hover: #F5C400
+   Primary: #ffc107 | Hover: #F5C400
    Background: #F7F7F5 | Cards: #FFFFFF | Borders: #E8E8E8
    Primary Text: #111111 | Secondary: #3F3F3F | Muted: #6B6B6B
    Success: #22A06B | Dark Section: #111111
@@ -114,7 +114,7 @@
   width: 96px;
   height: 96px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #ffd21f 0%, #f5c400 100%);
+  background: linear-gradient(135deg, #ffc107 0%, #f5c400 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -194,7 +194,7 @@
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: #ffd21f;
+  background: #ffc107;
   color: #111111;
   font-size: 0.72rem;
   font-weight: 900;
@@ -251,7 +251,7 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: #ffd21f;
+  background: #ffc107;
   color: #111111;
   border: none;
   border-radius: 999px;
@@ -315,7 +315,7 @@
   bottom: -6px;
   right: -8px;
   background: #ffffff;
-  border: 1.5px solid #ffd21f;
+  border: 1.5px solid #ffc107;
   border-radius: 12px;
   padding: 4px 10px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
@@ -401,7 +401,7 @@
 .form-field select:focus {
   outline: none;
   background: #ffffff;
-  border-color: #ffd21f;
+  border-color: #ffc107;
   box-shadow: 0 0 0 3px rgba(255, 210, 31, 0.25);
 }
 
@@ -412,7 +412,7 @@
 }
 
 .save-changes-btn {
-  background: #ffd21f;
+  background: #ffc107;
   color: #111111;
   border: none;
   border-radius: 999px;
@@ -468,7 +468,7 @@
 
 .profile-stat-card:hover {
   transform: translateY(-3px);
-  border-color: #ffd21f;
+  border-color: #ffc107;
   box-shadow: 0 8px 24px rgba(255, 210, 31, 0.12);
 }
 
@@ -572,7 +572,7 @@
 }
 
 .profile-nav-tab.is-active {
-  background: #ffd21f;
+  background: #ffc107;
   color: #111111;
   font-weight: 800;
   box-shadow: 0 2px 10px rgba(255, 210, 31, 0.35);
@@ -736,9 +736,9 @@
 }
 
 .sub-sync-btn:hover {
-  background: #ffd21f;
+  background: #ffc107;
   color: #111111;
-  border-color: #ffd21f;
+  border-color: #ffc107;
   transform: translateY(-2px);
 }
 
@@ -772,7 +772,7 @@
 }
 
 .sub-manage-plan-btn:hover {
-  background: #ffd21f;
+  background: #ffc107;
   color: #111111;
   transform: translateY(-2px);
   box-shadow: 0 4px 14px rgba(255, 210, 31, 0.3);
@@ -855,7 +855,7 @@
   align-self: flex-start;
   background: rgba(255, 210, 31, 0.15);
   border: 1px solid rgba(255, 210, 31, 0.4);
-  color: #ffd21f;
+  color: #ffc107;
   padding: 4px 12px;
   border-radius: 999px;
   font-size: 0.75rem;
@@ -885,7 +885,7 @@
 }
 
 .membership-cta-btn {
-  background: #ffd21f;
+  background: #ffc107;
   color: #111111;
   border: none;
   border-radius: 999px;
@@ -940,7 +940,7 @@
 }
 
 .continue-card-body:hover {
-  border-color: #ffd21f;
+  border-color: #ffc107;
   background: #ffffff;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
 }
@@ -974,7 +974,7 @@
   align-items: center;
   justify-content: center;
   background: rgba(0, 0, 0, 0.45);
-  color: #ffd21f;
+  color: #ffc107;
   font-size: 1.1rem;
   opacity: 0;
   transition: opacity 0.2s ease;
@@ -995,7 +995,7 @@
 
 .continue-progress-bar {
   height: 100%;
-  background: #ffd21f;
+  background: #ffc107;
 }
 
 .continue-meta-box {
@@ -1035,7 +1035,7 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: #ffd21f;
+  background: #ffc107;
   color: #111111;
   border: none;
   border-radius: 999px;
@@ -1084,7 +1084,7 @@
 
 .profile-video-card:hover {
   transform: translateY(-4px);
-  border-color: #ffd21f;
+  border-color: #ffc107;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
 }
 
@@ -1126,7 +1126,7 @@
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background: #ffd21f;
+  background: #ffc107;
   color: #111111;
   display: flex;
   align-items: center;
@@ -1238,7 +1238,7 @@
   height: 60px;
   border-radius: 50%;
   background: rgba(255, 210, 31, 0.16);
-  color: #ffd21f;
+  color: #ffc107;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1263,7 +1263,7 @@
 
 .empty-explore-btn {
   margin-top: 8px;
-  background: #ffd21f;
+  background: #ffc107;
   color: #111111;
   border: none;
   border-radius: 999px;
@@ -1307,7 +1307,7 @@
 
 .activity-timeline-item:hover {
   background: #ffffff;
-  border-color: #ffd21f;
+  border-color: #ffc107;
 }
 
 .act-icon-wrapper {
@@ -1376,7 +1376,7 @@
 
 .settings-row-btn:hover {
   background: #ffffff;
-  border-color: #ffd21f;
+  border-color: #ffc107;
   transform: translateX(3px);
 }
 
@@ -1467,7 +1467,7 @@
 
 .history-item-row:hover {
   background: #ffffff;
-  border-color: #ffd21f;
+  border-color: #ffc107;
   transform: translateX(4px);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
 }
@@ -1492,7 +1492,7 @@
   position: absolute;
   inset: 0;
   background: rgba(0, 0, 0, 0.45);
-  color: #ffd21f;
+  color: #ffc107;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1565,7 +1565,7 @@
 }
 
 .history-replay-btn:hover {
-  background: #ffd21f;
+  background: #ffc107;
   color: #111111;
 }
 
@@ -1600,9 +1600,9 @@
 }
 
 .filter-pill-btn.is-active {
-  background: #ffd21f;
+  background: #ffc107;
   color: #111111;
-  border-color: #ffd21f;
+  border-color: #ffc107;
   font-weight: 800;
 }
 
@@ -1683,7 +1683,7 @@
 }
 
 .ios-switch input:checked + .slider {
-  background-color: #ffd21f;
+  background-color: #ffc107;
 }
 
 .ios-switch input:checked + .slider::before {
