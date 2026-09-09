@@ -8,7 +8,6 @@ import {
   FaArrowRotateLeft,
   FaStar,
   FaBolt,
-  FaLock,
   FaTv,
   FaArrowRight
 } from 'react-icons/fa6';
@@ -39,16 +38,6 @@ export default function AnimeFooter({ onNavigate, onOpenLegalModal }) {
             <div className="highlight-text">
               <strong>1-Day All-Access Pass</strong>
               <span>1 GHS for 24-hour unlimited streaming</span>
-            </div>
-          </div>
-
-          <div className="highlight-item">
-            <div className="highlight-icon">
-              <FaLock />
-            </div>
-            <div className="highlight-text">
-              <strong>MTN Mobile Billing</strong>
-              <span>Instant 1-click carrier activation</span>
             </div>
           </div>
         </div>
@@ -234,20 +223,7 @@ export default function AnimeFooter({ onNavigate, onOpenLegalModal }) {
         {/* Bottom Copyright & Compliance Bar */}
         <div className="footer-bottom">
           <div className="copyright-info">
-            <span>
-              © 2026 GHSNAPFLIX.buzz • All rights reserved.
-              <span className="managed-by">
-                {' '}•{' '}
-                <a
-                  href="https://murtihub.co.in"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Managed by Murtihub.co.in
-                </a>
-              </span>
-            </span>
-            <span className="partner-note">MTN Mobile Billing Verified Partner</span>
+            <span>© 2026 GHSNAPFLIX.buzz • All rights reserved.</span>
           </div>
           <div className="community-tag">
             <span>Made with <span className="heart-span">❤️</span> for Anime Fans in Ghana</span>

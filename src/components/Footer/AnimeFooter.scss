@@ -470,41 +470,6 @@
         gap: 6px;
       }
 
-      .managed-by {
-        display: inline;
-        opacity: 0.67;
-        font-size: 0.52rem;
-        transition: opacity 0.19s ease;
-
-        a {
-          color: #5d6c9d;
-          text-decoration: none;
-          transition: color 0.2s ease;
-
-
-          &:hover {
-            text-decoration: underline;
-            color: #60a5fa;
-          }
-        }
-      }
-
-      .partner-note {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        color: #ffd21f;
-        font-weight: 700;
-        padding-left: 12px;
-        border-left: 1px solid rgba(255, 255, 255, 0.18);
-
-        @include mobile {
-          border-left: none;
-          padding-left: 0;
-        }
-
-        
-      }
     }
 
     .community-tag {
