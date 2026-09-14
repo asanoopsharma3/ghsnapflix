@@ -10,6 +10,8 @@ import {
   FaRotateRight,
   FaTriangleExclamation,
   FaFilm,
+  FaExpand,
+  FaCompress,
 } from 'react-icons/fa6';
 
 /**
@@ -77,6 +79,8 @@ const VideoPlayerModal = ({ video, onClose }) => {
   const [hasError, setHasError] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [rotation, setRotation] = useState(0);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isMobileLandscape, setIsMobileLandscape] = useState(false);
 
   const { isFavorite, toggleFavorite } = useFavorites();
   const videoKey = video?.title || video?.name || video?.id || '';
@@ -89,12 +93,15 @@ const VideoPlayerModal = ({ video, onClose }) => {
   // Reset rotation when video changes
   useEffect(() => {
     setRotation(0);
+    setIsMobileLandscape(false);
   }, [video?.videoUrl, video?.url]);
 
-  // Transform style for video / iframe rotation (PC only)
+  // Transform style for video / iframe rotation
   const rotationStyle = useMemo(() => {
     if (rotation === 0) return {};
-    const scale = rotation % 180 !== 0 ? 0.5625 : 1;
+    const isRotated90 = rotation % 180 !== 0;
+    // When rotated 90°/270° inside a 16:9 stage, scale by 16/9 (1.77778) to completely fill landscape display
+    const scale = isRotated90 ? 1.777778 : 1;
     return {
       transform: `rotate(${rotation}deg) scale(${scale})`,
       transformOrigin: 'center center',
@@ -102,11 +109,92 @@ const VideoPlayerModal = ({ video, onClose }) => {
     };
   }, [rotation]);
 
-  // Keyboard shortcut listener (Escape to close, Space to toggle native video, R to rotate on PC)
+  // Sync fullscreen state
+  useEffect(() => {
+    const handleFsChange = () => {
+      const fs = Boolean(document.fullscreenElement || document.webkitFullscreenElement);
+      setIsFullscreen(fs);
+      if (!fs) {
+        setIsMobileLandscape(false);
+        try {
+          window.screen?.orientation?.unlock?.();
+        } catch {}
+      }
+    };
+
+    document.addEventListener('fullscreenchange', handleFsChange);
+    document.addEventListener('webkitfullscreenchange', handleFsChange);
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFsChange);
+      document.removeEventListener('webkitfullscreenchange', handleFsChange);
+    };
+  }, []);
+
+  const handleRotate = () => {
+    setRotation((prev) => (prev + 90) % 360);
+  };
+
+  const handleToggleFullscreen = async () => {
+    const isMobile = window.innerWidth <= 768;
+    const target = stageRef.current || document.documentElement;
+    const currentlyFs = Boolean(document.fullscreenElement || document.webkitFullscreenElement);
+
+    if (!currentlyFs) {
+      if (isMobile) {
+        setIsMobileLandscape((prev) => !prev);
+        try {
+          if (window.screen?.orientation?.lock) {
+            await window.screen.orientation.lock('landscape');
+          }
+        } catch {}
+
+        if (sourceInfo.type === 'video' && videoRef.current?.webkitEnterFullscreen) {
+          try {
+            videoRef.current.webkitEnterFullscreen();
+            return;
+          } catch {}
+        }
+      }
+
+      try {
+        if (target.requestFullscreen) {
+          await target.requestFullscreen();
+        } else if (target.webkitRequestFullscreen) {
+          await target.webkitRequestFullscreen();
+        } else if (videoRef.current?.requestFullscreen) {
+          await videoRef.current.requestFullscreen();
+        }
+      } catch (err) {
+        console.warn('Fullscreen request failed:', err);
+      }
+    } else {
+      if (isMobile) {
+        setIsMobileLandscape(false);
+        try {
+          window.screen?.orientation?.unlock?.();
+        } catch {}
+      }
+      try {
+        if (document.exitFullscreen) {
+          await document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) {
+          await document.webkitExitFullscreen();
+        }
+      } catch (err) {
+        console.warn('Exit fullscreen failed:', err);
+      }
+    }
+  };
+
+  // Keyboard shortcut listener (Escape to close, Space to toggle play/pause, R to rotate, F to fullscreen)
   useEffect(() => {
     const handleKeyDown = (event) => {
       if (event.key === 'Escape') {
-        onClose();
+        if (isFullscreen) {
+          handleToggleFullscreen();
+        } else {
+          onClose();
+        }
       } else if (event.key === ' ' && sourceInfo.type === 'video' && videoRef.current) {
         if (event.target.tagName !== 'BUTTON' && event.target.tagName !== 'INPUT') {
           event.preventDefault();
@@ -116,10 +204,15 @@ const VideoPlayerModal = ({ video, onClose }) => {
             videoRef.current.pause();
           }
         }
-      } else if ((event.key === 'r' || event.key === 'R') && window.innerWidth > 768) {
+      } else if (event.key === 'r' || event.key === 'R') {
         if (event.target.tagName !== 'BUTTON' && event.target.tagName !== 'INPUT') {
           event.preventDefault();
-          setRotation((prev) => (prev + 90) % 360);
+          handleRotate();
+        }
+      } else if (event.key === 'f' || event.key === 'F') {
+        if (event.target.tagName !== 'BUTTON' && event.target.tagName !== 'INPUT') {
+          event.preventDefault();
+          handleToggleFullscreen();
         }
       }
     };
@@ -130,7 +223,7 @@ const VideoPlayerModal = ({ video, onClose }) => {
       document.body.style.overflow = '';
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [onClose, sourceInfo.type]);
+  }, [onClose, sourceInfo.type, isFullscreen]);
 
   // Autoplay native video on mount or URL change
   useEffect(() => {
@@ -146,12 +239,10 @@ const VideoPlayerModal = ({ video, onClose }) => {
         playPromise
           .then(() => setIsLoading(false))
           .catch(() => {
-            // Autoplay with sound might be blocked; fallback to ready state
             setIsLoading(false);
           });
       }
     } else {
-      // For iframe, assume loaded after initial mount
       const timer = setTimeout(() => setIsLoading(false), 600);
       return () => clearTimeout(timer);
     }
@@ -174,7 +265,12 @@ const VideoPlayerModal = ({ video, onClose }) => {
       aria-modal="true"
       aria-label={video?.title || 'Video Player'}
     >
-      <div className="video-player-modal" onClick={(e) => e.stopPropagation()}>
+      <div
+        className={`video-player-modal ${isFullscreen ? 'is-fullscreen' : ''} ${
+          isMobileLandscape ? 'is-mobile-landscape' : ''
+        }`}
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Header Bar */}
         <header className="video-player-header">
           {/* Mobile Back / Close Button */}
@@ -201,17 +297,17 @@ const VideoPlayerModal = ({ video, onClose }) => {
             </h2>
           </div>
 
-          {/* Right: Rotate Screen (PC Only), Favorite Toggle & Desktop Close Button */}
+          {/* Right: Rotate Screen, Fullscreen/Expand, Favorite & Close */}
           <div className="header-actions-right">
-            {/* Rotate Screen Button - Exclusively visible on PC / Desktop */}
+            {/* Rotate Screen Button - Available on both Window & Mobile */}
             <button
               type="button"
               className={`player-rotate-btn ${rotation !== 0 ? 'is-rotated' : ''}`}
-              onClick={() => setRotation((prev) => (prev + 90) % 360)}
+              onClick={handleRotate}
               title={
                 rotation !== 0
-                  ? `Screen rotated ${rotation}°. Click to rotate further (Shortcut: R)`
-                  : 'Rotate video screen 90° (PC only, Shortcut: R)'
+                  ? `Rotated ${rotation}°. Click to rotate further (Shortcut: R)`
+                  : 'Rotate video 90° to Landscape (Shortcut: R)'
               }
               aria-label="Rotate screen"
             >
@@ -223,8 +319,20 @@ const VideoPlayerModal = ({ video, onClose }) => {
                 }}
               />
               <span className="rotate-label">
-                {rotation !== 0 ? `Rotate ${rotation}°` : 'Rotate'}
+                {rotation !== 0 ? `${rotation}°` : 'Rotate'}
               </span>
+            </button>
+
+            {/* Expand / Fullscreen Button - Spans across full display landscape */}
+            <button
+              type="button"
+              className={`player-expand-btn ${isFullscreen ? 'is-active' : ''}`}
+              onClick={handleToggleFullscreen}
+              title={isFullscreen ? 'Exit Fullscreen (F)' : 'Expand Fullscreen Landscape (F)'}
+              aria-label="Toggle Fullscreen Landscape"
+            >
+              {isFullscreen ? <FaCompress className="expand-icon" /> : <FaExpand className="expand-icon" />}
+              <span className="expand-label">{isFullscreen ? 'Exit' : 'Expand'}</span>
             </button>
 
             <button

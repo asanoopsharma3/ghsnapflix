@@ -85,7 +85,8 @@ export default function LegalSupportModal({ isOpen, initialTab = 'terms', onClos
             onClick={() => setActiveTab('help')}
           >
             <FaHeadset className="tab-icon" />
-            <span>Help Center</span>
+            <span className="tab-label-full">Help Center</span>
+            <span className="tab-label-short">Help</span>
           </button>
           <button
             type="button"
@@ -93,7 +94,8 @@ export default function LegalSupportModal({ isOpen, initialTab = 'terms', onClos
             onClick={() => setActiveTab('terms')}
           >
             <FaFileContract className="tab-icon" />
-            <span>Terms & Conditions</span>
+            <span className="tab-label-full">Terms & Conditions</span>
+            <span className="tab-label-short">Terms</span>
           </button>
           <button
             type="button"
@@ -101,7 +103,8 @@ export default function LegalSupportModal({ isOpen, initialTab = 'terms', onClos
             onClick={() => setActiveTab('privacy')}
           >
             <FaShieldHalved className="tab-icon" />
-            <span>Privacy Policy</span>
+            <span className="tab-label-full">Privacy Policy</span>
+            <span className="tab-label-short">Privacy</span>
           </button>
           <button
             type="button"
@@ -109,7 +112,8 @@ export default function LegalSupportModal({ isOpen, initialTab = 'terms', onClos
             onClick={() => setActiveTab('subscription')}
           >
             <FaArrowRotateLeft className="tab-icon" />
-            <span>Subscription Policy</span>
+            <span className="tab-label-full">Subscription Policy</span>
+            <span className="tab-label-short">Billing</span>
           </button>
         </div>
 

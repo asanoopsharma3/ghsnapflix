@@ -13,7 +13,6 @@ import {
   FaFire,
   FaGhost,
   FaMasksTheater,
-  FaBrain,
   FaMagnifyingGlass,
   FaXmark,
 } from 'react-icons/fa6';
@@ -50,9 +49,6 @@ const detectAnimeCategory = (title = '') => {
   if (t.includes('blue lock') || t.includes('haikyuu') || t.includes('comedy') || t.includes('blue box') || t.includes('funny') || t.includes('jojo')) {
     return 'comedy';
   }
-  if (t.includes('brain') || t.includes('code geass') || t.includes('mind') || t.includes('special moment')) {
-    return 'brain';
-  }
   return 'anime';
 };
 
@@ -77,7 +73,6 @@ const CATEGORIES = [
   { id: 'fighting', name: 'Fighting', icon: <FaFire /> },
   { id: 'thriller', name: 'Thriller', icon: <FaGhost /> },
   { id: 'comedy', name: 'Comedy', icon: <FaMasksTheater /> },
-  { id: 'brain', name: 'Brain Tease', icon: <FaBrain /> },
 ];
 
 const ITEMS_PER_PAGE = 16;
@@ -380,15 +375,10 @@ export default function VideosPage({
         <section className="all-videos-block" aria-label="All Videos">
           <div className="section-toolbar">
             <div className="section-title-wrap">
-              <div className="title-row">
-                <h2>
-                  {selectedCategory !== 'all'
-                    ? `${CATEGORIES.find((c) => c.id === selectedCategory)?.name || selectedCategory} Videos`
-                    : 'All Videos'}
-                </h2>
-              </div>
-              <span className="subtitle">
-                Explore the latest content from the GHSNAPFLIX community.
+              <span className="results-count-pill">
+                {selectedCategory !== 'all'
+                  ? `${CATEGORIES.find((c) => c.id === selectedCategory)?.name || selectedCategory} (${filteredVideos.length})`
+                  : `All Videos (${filteredVideos.length})`}
               </span>
             </div>
 

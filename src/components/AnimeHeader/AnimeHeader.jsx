@@ -90,9 +90,8 @@ export default function AnimeHeader({
             <button
               type="button"
               className="subscribe-btn subscribed"
-              onClick={() => onNavigate('subscription-management')}
-              onClick={() => onNavigate('subscription')}
-              title="Manage Active 1-Day Pass"
+              onClick={() => onNavigate('videos')}
+              title="Pass Active - Browse Videos"
             >
               <FaCheck style={{ marginRight: 6, fontSize: '0.85rem' }} />
               <span>Pass Active</span>

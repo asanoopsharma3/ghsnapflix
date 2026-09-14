@@ -10,10 +10,11 @@ import {
   FaBolt,
   FaLock,
   FaTv,
-  FaArrowRight
+  FaArrowRight,
+  FaGear
 } from 'react-icons/fa6';
 
-export default function AnimeFooter({ onNavigate, onOpenLegalModal }) {
+export default function AnimeFooter({ onNavigate, onOpenLegalModal, onOpenDemoAdmin }) {
   return (
     <footer className="anime-footer">
       {/* Top Ambient Glow Line */}
@@ -153,14 +154,7 @@ export default function AnimeFooter({ onNavigate, onOpenLegalModal }) {
                 >
                   <span>Favorites</span>
                 </button>
-                <button
-                  type="button"
-                  className="nav-pill pill-rewards"
-                  onClick={() => onNavigate('rewards')}
-                >
-                  <FaStar className="pill-star" />
-                  <span>Rewards</span>
-                </button>
+
               </div>
             </div>
 
@@ -236,18 +230,17 @@ export default function AnimeFooter({ onNavigate, onOpenLegalModal }) {
           <div className="copyright-info">
             <span>
               © 2026 GHSNAPFLIX.buzz • All rights reserved.
-              <span className="managed-by">
-                {' '}•{' '}
-                <a
-                  href="https://murtihub.co.in"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Managed by Murtihub.co.in
-                </a>
-              </span>
             </span>
             <span className="partner-note">MTN Mobile Billing Verified Partner</span>
+            <button
+              type="button"
+              className="footer-demo-admin-pill"
+              onClick={() => onOpenDemoAdmin ? onOpenDemoAdmin() : onNavigate('admin')}
+              title="Open Demo Admin Portal"
+            >
+              <FaGear className="gear-icon" />
+              <span>Demo Admin</span>
+            </button>
           </div>
           <div className="community-tag">
             <span>Made with <span className="heart-span">❤️</span> for Anime Fans in Ghana</span>

@@ -50,9 +50,12 @@
   overflow: hidden;
   animation: legalModalSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 
-  @include mobile {
+  @media (max-width: 640px) {
     max-height: 94vh;
-    border-radius: 16px;
+    border-radius: 18px;
+    width: 95%;
+    max-width: 95%;
+    margin: 10px auto;
   }
 }
 
@@ -61,42 +64,56 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 22px 24px 18px;
+  padding: 20px 24px 16px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   background: rgba(255, 255, 255, 0.02);
+
+  @media (max-width: 640px) {
+    padding: 14px 16px 12px;
+    gap: 10px;
+  }
 
   .modal-title-group {
     display: flex;
     align-items: center;
     gap: 14px;
+    min-width: 0;
+
+    @media (max-width: 640px) {
+      gap: 10px;
+    }
 
     .modal-icon-badge {
       width: 44px;
       height: 44px;
       border-radius: 12px;
-      background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
-      color: #ffffff;
       background: linear-gradient(135deg, #ffd21f 0%, #f5c400 100%);
       color: #0b0c12;
       @include flex-center;
       font-size: 1.25rem;
-      box-shadow: 0 4px 16px rgba(124, 58, 237, 0.35);
       box-shadow: 0 4px 16px rgba(255, 210, 31, 0.35);
       flex-shrink: 0;
+
+      @media (max-width: 640px) {
+        width: 36px;
+        height: 36px;
+        font-size: 1.05rem;
+        border-radius: 10px;
+      }
     }
 
     .modal-title {
-      font-size: 1.22rem;
+      font-size: 1.18rem;
       font-weight: 900;
       color: #ffffff;
       margin: 0;
-      line-height: 1.2;
-      letter-spacing: 0.6px;
+      line-height: 1.25;
+      letter-spacing: 0.5px;
       text-transform: uppercase;
       font-family: inherit;
 
-      @include mobile {
-        font-size: 1.05rem;
+      @media (max-width: 640px) {
+        font-size: 0.95rem;
       }
     }
 
@@ -105,9 +122,12 @@
       margin-top: 3px;
       font-size: 0.78rem;
       font-weight: 700;
-      color: #38bdf8;
       color: #ffd21f;
       letter-spacing: 0.5px;
+
+      @media (max-width: 640px) {
+        font-size: 0.72rem;
+      }
     }
   }
 
@@ -122,10 +142,15 @@
     font-size: 1rem;
     cursor: pointer;
     transition: all 0.2s ease;
+    flex-shrink: 0;
+
+    @media (max-width: 640px) {
+      width: 32px;
+      height: 32px;
+      font-size: 0.9rem;
+    }
 
     &:hover {
-      background: rgba(255, 255, 255, 0.15);
-      color: #ffffff;
       background: #ffd21f;
       color: #0b0c12;
       border-color: #ffd21f;
@@ -139,52 +164,76 @@
   display: flex;
   gap: 8px;
   padding: 12px 24px;
-  background: rgba(0, 0, 0, 0.25);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(0, 0, 0, 0.35);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   overflow-x: auto;
   scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+
+  @media (max-width: 640px) {
+    padding: 10px 14px;
+    gap: 6px;
+  }
 
   &::-webkit-scrollbar {
     display: none;
   }
 
   .tab-btn {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 8px;
-    padding: 8px 14px;
-    border-radius: 10px;
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    color: #94a3b8;
+    justify-content: center;
+    gap: 7px;
+    padding: 8px 16px;
+    border-radius: 9999px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #cbd5e1;
     font-size: 0.84rem;
     font-weight: 700;
     cursor: pointer;
     white-space: nowrap;
+    flex-shrink: 0;
     transition: all 0.2s ease;
 
     .tab-icon {
       font-size: 0.88rem;
     }
 
+    .tab-label-short {
+      display: none;
+    }
+
+    .tab-label-full {
+      display: inline;
+    }
+
+    @media (max-width: 640px) {
+      padding: 7px 12px;
+      font-size: 0.78rem;
+      gap: 5px;
+
+      .tab-label-full {
+        display: none;
+      }
+      .tab-label-short {
+        display: inline;
+      }
+    }
+
     &:hover {
-      background: rgba(255, 255, 255, 0.08);
-      color: #ffffff;
-      background: rgba(255, 210, 31, 0.1);
+      background: rgba(255, 210, 31, 0.12);
       color: #ffd21f;
-      border-color: rgba(255, 210, 31, 0.3);
+      border-color: rgba(255, 210, 31, 0.35);
     }
 
     &.is-active {
-      background: linear-gradient(135deg, #7c3aed 0%, #9333ea 100%);
-      color: #ffffff;
-      border-color: #a855f7;
-      box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
-      background: linear-gradient(135deg, #ffd21f 0%, #f5c400 100%);
+      background: #ffd21f;
       color: #0b0c12;
       border-color: #ffd21f;
       font-weight: 800;
-      box-shadow: 0 4px 14px rgba(255, 210, 31, 0.35);
+      box-shadow: 0 3px 12px rgba(255, 210, 31, 0.35);
 
       .tab-icon {
         color: #0b0c12;
