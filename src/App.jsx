@@ -140,6 +140,19 @@ function AppContent() {
           category: 'Anime Trailer',
         };
       }
+      if (videoParam === 'jjk' || videoParam === 'sukuna') {
+        return {
+          id: 'feat-2',
+          title: 'Jujutsu Kaisen Best Scene',
+          duration: '02:08',
+          views: '2.8M',
+          timestamp: '1 month ago',
+          thumbnail: '/thumbnails/jjk.jpg',
+          videoUrl: 'https://snapflix-mp4.s3.ap-southeast-2.amazonaws.com/Anime_mp4/144%20-%20Jujutsu%20Kaisen%20Best%20Scene.mp4',
+          category: 'Fighting',
+          autoAdjust: true,
+        };
+      }
       return {
         id: 'trend-1',
         title: 'The Promise Of Zoro',

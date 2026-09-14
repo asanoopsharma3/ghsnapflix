@@ -96,6 +96,7 @@ export const TRENDING_ANIME_VIDEOS = [
     thumbnail: '/thumbnails/gojo.jpg',
     videoUrl: findS3Url('129 - Satoro Gojo Edit'),
     category: 'Fighting',
+    autoAdjust: true,
   },
 ];
 
@@ -121,6 +122,7 @@ export const FEATURED_ANIME_VIDEOS = [
     videoUrl: findS3Url('144 - Jujutsu Kaisen Best Scene'),
     isFeatured: true,
     category: 'Fighting',
+    autoAdjust: true,
   },
   {
     id: 'feat-3',
