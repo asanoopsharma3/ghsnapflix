@@ -89,11 +89,11 @@ export default function FAQPage({ onNavigate }) {
     },
     {
       id: 8,
-      category: 'rewards',
+      category: 'streaming',
       icon: <FaGift />,
-      question: 'How does the rewards system work?',
+      question: 'Are new anime videos added regularly?',
       answer:
-        'You earn reward points by completing daily streaming streaks, playing featured video clips, rating community uploads, and participating in weekly anime trivia challenges. Points can be redeemed for exclusive badges and perks.',
+        'Yes! Our catalog is updated daily with the newest trending anime clips, AMV premieres, action scenes, and fan favorites from popular series worldwide.',
     },
     {
       id: 9,
@@ -151,6 +151,7 @@ export default function FAQPage({ onNavigate }) {
       title: 'Billing & Subscription',
       desc: 'Manage your plan',
       action: () => (onNavigate ? onNavigate('subscription-management') : null),
+      action: () => (onNavigate ? onNavigate('subscription') : null),
     },
     {
       icon: <FaWrench />,
@@ -181,9 +182,9 @@ export default function FAQPage({ onNavigate }) {
     },
     {
       icon: <FaLightbulb />,
-      title: 'Tips & Tricks',
-      desc: 'Maximize daily streak bonuses and reward points',
-      action: () => (onNavigate ? onNavigate('rewards') : null),
+      title: 'Anime Catalog',
+      desc: 'Discover daily anime premieres and trending clips',
+      action: () => (onNavigate ? onNavigate('videos') : null),
     },
     {
       icon: <FaDownload />,

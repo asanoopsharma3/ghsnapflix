@@ -89,22 +89,6 @@ export default function DualPromo({ onSelectGenre, onUploadClick }) {
               </div>
               <span>Comedy</span>
             </button>
-
-            <button
-              type="button"
-              className="genre-btn"
-              onClick={() => onSelectGenre('brain')}
-            >
-              <div className="genre-icon-wrap brain">
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2">
-                  <circle cx="12" cy="12" r="9" />
-                  <line x1="12" y1="3" x2="12" y2="21" />
-                  <line x1="3" y1="12" x2="21" y2="12" />
-                  <circle cx="12" cy="12" r="4" />
-                </svg>
-              </div>
-              <span>Brain Tease</span>
-            </button>
           </div>
         </div>
       </div>

@@ -5,13 +5,9 @@ import PostLoginHeader from './components/PostLoginHeader';
 import InteractiveCarousel from './components/InteractiveCarousel';
 import VideoCategories from './components/GameCategories';
 import VideosSection from './components/VideosSection';
-import FavoritesSection from './components/FavoritesSection';
 import LoginModal from './components/LoginModal';
-import RewardsPage from './components/RewardsPage';
 import SubscriptionPage from './components/SubscriptionPage';
 import NewsPage from './components/NewsPage';
-import UnsubscribePage from './components/UnsubscribePage';
-import SubscriptionManagementPage from './components/SubscriptionManagementPage';
 import VideosPage from './components/VideosPage';
 import FavoritesPage from './components/FavoritesPage';
 import ExploreVideosPage from './components/ExploreVideosPage';
@@ -58,12 +54,8 @@ import { resolveCgwCallbackNotice } from './utils/cgwStatus';
 import LoadingSpinner from './components/LoadingSpinner';
 import { addToWatchHistory } from './utils/watchHistory';
 
-// Security: permanently purge any legacy demo subscription tokens
-try {
-  localStorage.removeItem('is_demo_subscription');
-} catch {}
-
 function AppContent() {
+  
   const [showLoginModal, setShowLoginModal] = useState(() => {
     try {
       const p = new URLSearchParams(window.location.search);
@@ -78,6 +70,12 @@ function AppContent() {
   const [currentPage, setCurrentPage] = useState(() => {
     try {
       const p = new URLSearchParams(window.location.search).get('page');
+      if (p === 'admin') {
+        return 'home';
+      }
+      if (p === 'unsubscribe' || p === 'subscription-management' || p === 'rewards') {
+        return 'subscription';
+      }
       return p || 'home';
     } catch {
       return 'home';
@@ -125,6 +123,19 @@ function AppContent() {
           thumbnail: '/thumbnails/demon_slayer.jpg',
           videoUrl: 'https://www.youtube.com/watch?v=VQGCKyvzIM4',
           category: 'Anime Trailer',
+        };
+      }
+      if (videoParam === 'jjk' || videoParam === 'sukuna') {
+        return {
+          id: 'feat-2',
+          title: 'Jujutsu Kaisen Best Scene',
+          duration: '02:08',
+          views: '2.8M',
+          timestamp: '1 month ago',
+          thumbnail: '/thumbnails/jjk.jpg',
+          videoUrl: 'https://snapflix-mp4.s3.ap-southeast-2.amazonaws.com/Anime_mp4/144%20-%20Jujutsu%20Kaisen%20Best%20Scene.mp4',
+          category: 'Fighting',
+          autoAdjust: true,
         };
       }
       return {
@@ -258,7 +269,7 @@ function AppContent() {
     const syncFromBackend = async () => {
       const saved = loadAppSession();
       applySession();
-      if (!localStorage.getItem('token')) {
+      if (isDemoAdminEnabled() || !localStorage.getItem('token')) {
         return;
       }
 
@@ -444,6 +455,7 @@ function AppContent() {
   }, []);
 
   const handleNavigate = useCallback((page) => {
+
     if (page === 'login') {
       setShowLoginModal(true);
       return;
@@ -454,33 +466,21 @@ function AppContent() {
       return;
     }
 
-    if (page === 'subscription') {
-      handleSubscribeEntry();
-      return;
-    }
-
     if (page === 'categories') {
       setCurrentPage('videos');
       window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
 
-    // Protected routes requiring active authentication
-    if (['unsubscribe', 'subscription-management'].includes(page)) {
-      const session = loadAppSession();
-      if (!session.isLoggedIn) {
-        setShowLoginModal(true);
-        setNotification({
-          message: 'Please sign in with your phone number to access this section.',
-          type: 'info',
-        });
-        return;
-      }
+    if (page === 'unsubscribe' || page === 'subscription-management' || page === 'rewards' || (page === 'subscription' && isSubscribed)) {
+      setCurrentPage('videos');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
     }
 
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, [handleSubscribeEntry]);
+  }, [isSubscribed]);
 
   const handleCloseNotification = useCallback(() => {
     setNotification(null);
@@ -492,30 +492,18 @@ function AppContent() {
 
   const renderPage = () => {
     switch (currentPage) {
-      case 'rewards':
-        return <RewardsPage onNavigate={handleNavigate} />;
       case 'subscription':
         return (
           <SubscriptionPage
             msisdn={phoneNumber}
+            isSubscribed={isSubscribed}
             onSubscribeSuccess={handleSubscribeSuccess}
             onNotify={handleNotify}
+            onNavigate={handleNavigate}
           />
         );
       case 'news':
         return <NewsPage />;
-      case 'unsubscribe':
-        return <UnsubscribePage onNavigate={handleNavigate} onLogout={handleLogout} />;
-      case 'subscription-management':
-        return (
-          <SubscriptionManagementPage
-            onNavigate={handleNavigate}
-            phoneNumber={phoneNumber}
-            isSubscribed={isSubscribed}
-            onSubscribeClick={handleSubscribeEntry}
-            onNotify={handleNotify}
-          />
-        );
       case 'videos':
       case 'categories':
       case 'trending':
@@ -587,10 +575,14 @@ function AppContent() {
   if (isFooterView) {
     return (
       <div style={{ background: '#07080d', minHeight: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-        <AnimeFooter onNavigate={handleNavigate} onOpenLegalModal={(t) => setLegalModalTab(t)} />
+        <AnimeFooter
+          onNavigate={handleNavigate}
+          onOpenLegalModal={(t) => setLegalModalTab(t)}
+        />
         {legalModalTab && (
           <LegalSupportModal isOpen={!!legalModalTab} initialTab={legalModalTab} onClose={() => setLegalModalTab(null)} />
         )}
+        
       </div>
     );
   }
@@ -615,6 +607,7 @@ function AppContent() {
       <AnimeFooter
         onNavigate={handleNavigate}
         onOpenLegalModal={(tab) => setLegalModalTab(tab)}
+        
       />
       
       {legalModalTab && (
@@ -638,6 +631,9 @@ function AppContent() {
         <VideoPlayerModal video={activeVideo} onClose={handleCloseVideoPlayer} />
       )}
 
+      
+
+      
       {notification && (
         <Notification
           message={notification.message}

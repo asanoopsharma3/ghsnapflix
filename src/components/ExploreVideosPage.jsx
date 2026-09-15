@@ -72,7 +72,7 @@ export default function ExploreVideosPage({ onVideoPlay, onNavigate }) {
   const ADVENTURE_VIDEOS = [
     {
       id: 'adv-1',
-      title: 'The Last Horizon',
+      title: 'Luffy In Skypiea',
       duration: '5:32',
       views: '1.2M',
       timestamp: '2 weeks ago',
@@ -81,7 +81,7 @@ export default function ExploreVideosPage({ onVideoPlay, onNavigate }) {
     },
     {
       id: 'adv-2',
-      title: 'Echoes of the Wild',
+      title: 'The Tunnel To Summer',
       duration: '5:32',
       views: '856K',
       timestamp: '3 weeks ago',
@@ -90,7 +90,7 @@ export default function ExploreVideosPage({ onVideoPlay, onNavigate }) {
     },
     {
       id: 'adv-3',
-      title: 'Beyond the Mountains',
+      title: 'Attack On Titan',
       duration: '5:32',
       views: '2.4M',
       timestamp: '1 month ago',
@@ -99,7 +99,7 @@ export default function ExploreVideosPage({ onVideoPlay, onNavigate }) {
     },
     {
       id: 'adv-4',
-      title: 'A New Beginning',
+      title: 'The Tale Of Naruto Uzumaki',
       duration: '5:32',
       views: '1.1M',
       timestamp: '1 month ago',

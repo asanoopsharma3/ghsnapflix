@@ -669,8 +669,10 @@ const ProfilePage = ({
                         onNavigate('subscription');
                       }
                     }}
+                    onClick={() => onNavigate('subscription')}
                   >
                     <span>{effectiveSubscribed ? 'Manage Plan' : 'Upgrade to Premium'}</span>
+                    <span>{effectiveSubscribed ? 'View Subscription Pass' : 'Subscribe'}</span>
                     <FaArrowRight className="btn-arrow" />
                   </button>
                 </div>
@@ -1395,8 +1397,10 @@ const ProfilePage = ({
                       onNavigate('subscription');
                     }
                   }}
+                  onClick={() => onNavigate('subscription')}
                 >
                   {effectiveSubscribed ? 'Manage Subscription Pass' : 'Upgrade to Premium Pass'}
+                  {effectiveSubscribed ? 'View Subscription Pass' : 'Subscribe'}
                 </button>
                 {effectiveSubscribed && (
                   <button

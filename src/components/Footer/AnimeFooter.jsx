@@ -8,11 +8,13 @@ import {
   FaArrowRotateLeft,
   FaStar,
   FaBolt,
+  FaLock,
   FaTv,
-  FaArrowRight
+  FaArrowRight,
+  FaGear
 } from 'react-icons/fa6';
 
-export default function AnimeFooter({ onNavigate, onOpenLegalModal }) {
+export default function AnimeFooter({ onNavigate, onOpenLegalModal, onOpenDemoAdmin }) {
   return (
     <footer className="anime-footer">
       {/* Top Ambient Glow Line */}
@@ -38,6 +40,16 @@ export default function AnimeFooter({ onNavigate, onOpenLegalModal }) {
             <div className="highlight-text">
               <strong>1-Day All-Access Pass</strong>
               <span>1 GHS for 24-hour unlimited streaming</span>
+            </div>
+          </div>
+
+          <div className="highlight-item">
+            <div className="highlight-icon">
+              <FaLock />
+            </div>
+            <div className="highlight-text">
+              <strong>MTN Mobile Billing</strong>
+              <span>Instant 1-click carrier activation</span>
             </div>
           </div>
         </div>
@@ -142,14 +154,7 @@ export default function AnimeFooter({ onNavigate, onOpenLegalModal }) {
                 >
                   <span>Favorites</span>
                 </button>
-                <button
-                  type="button"
-                  className="nav-pill pill-rewards"
-                  onClick={() => onNavigate('rewards')}
-                >
-                  <FaStar className="pill-star" />
-                  <span>Rewards</span>
-                </button>
+
               </div>
             </div>
 
@@ -223,7 +228,11 @@ export default function AnimeFooter({ onNavigate, onOpenLegalModal }) {
         {/* Bottom Copyright & Compliance Bar */}
         <div className="footer-bottom">
           <div className="copyright-info">
-            <span>© 2026 GHSNAPFLIX.buzz • All rights reserved.</span>
+            <span>
+              © 2026 GHSNAPFLIX.buzz • All rights reserved.
+            </span>
+            <span className="partner-note">MTN Mobile Billing Verified Partner</span>
+           
           </div>
           <div className="community-tag">
             <span>Made with <span className="heart-span">❤️</span> for Anime Fans in Ghana</span>

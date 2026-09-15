@@ -25,7 +25,9 @@ const HERO_SLIDES = [
     quote: "It's Not Over Yet...",
     subQuote: 'ANIME CONNECTS US ALL',
     image: '/images/hero-bg1.png',
-    videoUrl: 'https://ghsnapflix-videos.s3.amazonaws.com/snapflix-01.mp4',
+    thumbnail: '/thumbnails/zoro.jpg',
+    videoTitle: 'The Promise Of Zoro',
+    videoUrl: 'https://snapflix-mp4.s3.ap-southeast-2.amazonaws.com/Anime_mp4/108%20-%20The%20Promise%20Of%20Zoro.mp4',
   },
   {
     id: 2,
@@ -37,7 +39,9 @@ const HERO_SLIDES = [
     quote: 'Same Anime, Different Perspective',
     subQuote: 'GOOD ANIME, BETTER PEOPLE',
     image: '/images/hero-bg2.png',
-    videoUrl: 'https://ghsnapflix-videos.s3.amazonaws.com/snapflix-02.mp4',
+    thumbnail: '/thumbnails/jinwoo.jpg',
+    videoTitle: 'Sung Jin Woo Aura',
+    videoUrl: 'https://snapflix-mp4.s3.ap-southeast-2.amazonaws.com/Anime_mp4/11%20-%20Sung%20Jin%20Woo%20Aura.mp4',
   },
   {
     id: 3,
@@ -49,7 +53,9 @@ const HERO_SLIDES = [
     quote: 'Good Stories, Brighter People',
     subQuote: 'A BRIGHTER TOMORROW',
     image: '/images/hero-bg3.png',
-    videoUrl: 'https://ghsnapflix-videos.s3.amazonaws.com/snapflix-03.mp4',
+    thumbnail: '/thumbnails/naruto.jpg',
+    videoTitle: 'The Tale Of Naruto Uzumaki',
+    videoUrl: 'https://snapflix-mp4.s3.ap-southeast-2.amazonaws.com/Anime_mp4/110%20-%20The%20Tale%20Of%20Naruto%20Uzumaki.mp4',
   },
   {
     id: 4,
@@ -61,7 +67,9 @@ const HERO_SLIDES = [
     quote: "It's Not Over Yet...",
     subQuote: 'CULTURE ALWAYS',
     image: '/images/hero-bg4.png',
-    videoUrl: 'https://ghsnapflix-videos.s3.amazonaws.com/snapflix-04.mp4',
+    thumbnail: '/thumbnails/gojo.jpg',
+    videoTitle: 'Satoro Gojo Edit',
+    videoUrl: 'https://snapflix-mp4.s3.ap-southeast-2.amazonaws.com/Anime_mp4/129%20-%20Satoro%20Gojo%20Edit.mp4',
   },
 ];
 
@@ -90,8 +98,9 @@ export default function HeroBanner({ onVideoPlay, onNavigate }) {
     if (onVideoPlay) {
       onVideoPlay({
         id: `hero-${slide.id}`,
-        title: `${slide.titleLine1} ${slide.titleHighlight}`,
+        title: slide.videoTitle || `${slide.titleLine1} ${slide.titleHighlight}`,
         videoUrl: slide.videoUrl,
+        thumbnail: slide.thumbnail || slide.image,
         category: 'Featured',
       });
     }

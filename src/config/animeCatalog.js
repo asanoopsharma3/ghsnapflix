@@ -19,10 +19,10 @@ export const ANIME_THUMBNAILS_COLLECTION = [
 export const getMatchingAnimeThumbnail = (title = '', fallbackIndex = 0) => {
   const t = title.toLowerCase();
   if (t.includes('zoro') || t.includes('swordsman')) return '/thumbnails/zoro.jpg';
-  if (t.includes('jin woo') || t.includes('solo leveling') || t.includes('thomas andre')) return '/thumbnails/jinwoo.jpg';
-  if (t.includes('naruto') || t.includes('orochimaru')) return '/thumbnails/naruto.jpg';
-  if (t.includes('gojo') || t.includes('satoro')) return '/thumbnails/gojo.jpg';
-  if (t.includes('jujutsu') || t.includes('sukuna')) return '/thumbnails/jjk.jpg';
+  if (t.includes('jin woo') || t.includes('jinwoo') || t.includes('solo leveling') || t.includes('thomas andre') || t.includes('sung')) return '/thumbnails/jinwoo.jpg';
+  if (t.includes('naruto') || t.includes('orochimaru') || t.includes('sasuke') || t.includes('hinata')) return '/thumbnails/naruto.jpg';
+  if (t.includes('gojo') || t.includes('satoro') || t.includes('satao')) return '/thumbnails/gojo.jpg';
+  if (t.includes('jujutsu') || t.includes('sukuna') || t.includes('jjk')) return '/thumbnails/jjk.jpg';
   if (t.includes('danger in my heart') || t.includes('dangers in my heart')) return '/thumbnails/danger_heart.jpg';
   if (
     t.includes('luffy') ||
@@ -37,7 +37,7 @@ export const getMatchingAnimeThumbnail = (title = '', fallbackIndex = 0) => {
     return '/thumbnails/luffy.jpg';
   }
   if (t.includes('tunnel to summer') || t.includes('tunnel')) return '/thumbnails/tunnel_summer.jpg';
-  if (t.includes('somebody watching me') || t.includes('cyberpunk')) return '/thumbnails/cyberpunk.jpg';
+  if (t.includes('somebody watching me') || t.includes('cyberpunk') || t.includes('lone wolf')) return '/thumbnails/cyberpunk.jpg';
   if (t.includes('titan') || t.includes('eren') || t.includes('erin')) return '/thumbnails/eren_aot.jpg';
   if (t.includes('blue lock')) return '/thumbnails/bluelock.jpg';
   if (t.includes('demon slayer') || t.includes('demon slayed') || t.includes('slayer')) return '/thumbnails/demon_slayer.jpg';
@@ -46,10 +46,13 @@ export const getMatchingAnimeThumbnail = (title = '', fallbackIndex = 0) => {
   return ANIME_THUMBNAILS_COLLECTION[fallbackIndex % ANIME_THUMBNAILS_COLLECTION.length];
 };
 
-const findS3Url = (substring, fallbackIndex = 0) => {
-  const found = SNAPFLIX_S3_VIDEO_URLS.find((url) =>
-    url.toLowerCase().includes(substring.toLowerCase().replace(/\s+/g, ''))
-  );
+export const findS3Url = (substring, fallbackIndex = 0) => {
+  if (!substring) return SNAPFLIX_S3_VIDEO_URLS[fallbackIndex] || '';
+  const normQuery = substring.toLowerCase().replace(/[^a-z0-9]/g, '');
+  const found = SNAPFLIX_S3_VIDEO_URLS.find((url) => {
+    const decoded = decodeURIComponent(url).toLowerCase().replace(/[^a-z0-9]/g, '');
+    return decoded.includes(normQuery);
+  });
   return found || SNAPFLIX_S3_VIDEO_URLS[fallbackIndex] || '';
 };
 
@@ -61,7 +64,7 @@ export const TRENDING_ANIME_VIDEOS = [
     views: '1.2M',
     timestamp: '2 weeks ago',
     thumbnail: '/thumbnails/zoro.jpg',
-    videoUrl: findS3Url('The Promise Of Zoro', 17),
+    videoUrl: findS3Url('108 - The Promise Of Zoro'),
     category: 'Action',
   },
   {
@@ -71,7 +74,7 @@ export const TRENDING_ANIME_VIDEOS = [
     views: '896K',
     timestamp: '1 month ago',
     thumbnail: '/thumbnails/jinwoo.jpg',
-    videoUrl: findS3Url('Sung Jin Woo Aura', 19),
+    videoUrl: findS3Url('11 - Sung Jin Woo Aura'),
     category: 'Action',
   },
   {
@@ -81,7 +84,7 @@ export const TRENDING_ANIME_VIDEOS = [
     views: '2.4M',
     timestamp: '3 weeks ago',
     thumbnail: '/thumbnails/naruto.jpg',
-    videoUrl: findS3Url('The Tale Of Naruto Uzumaki', 20),
+    videoUrl: findS3Url('110 - The Tale Of Naruto Uzumaki'),
     category: 'Adventure',
   },
   {
@@ -91,8 +94,9 @@ export const TRENDING_ANIME_VIDEOS = [
     views: '1.7M',
     timestamp: '1 month ago',
     thumbnail: '/thumbnails/gojo.jpg',
-    videoUrl: findS3Url('Jujutsu Kaise Edit', 33),
+    videoUrl: findS3Url('129 - Satoro Gojo Edit'),
     category: 'Fighting',
+    autoAdjust: true,
   },
 ];
 
@@ -104,7 +108,7 @@ export const FEATURED_ANIME_VIDEOS = [
     views: '1.3M',
     timestamp: '2 weeks ago',
     thumbnail: '/thumbnails/danger_heart.jpg',
-    videoUrl: findS3Url('Anime Edit', 0),
+    videoUrl: findS3Url('14 - The Danger In My Heart'),
     isFeatured: true,
     category: 'Romance',
   },
@@ -115,9 +119,10 @@ export const FEATURED_ANIME_VIDEOS = [
     views: '2.8M',
     timestamp: '1 month ago',
     thumbnail: '/thumbnails/jjk.jpg',
-    videoUrl: findS3Url('Jujutsu Kaise Edit', 33),
+    videoUrl: findS3Url('144 - Jujutsu Kaisen Best Scene'),
     isFeatured: true,
     category: 'Fighting',
+    autoAdjust: true,
   },
   {
     id: 'feat-3',
@@ -126,7 +131,7 @@ export const FEATURED_ANIME_VIDEOS = [
     views: '1.9M',
     timestamp: '2 weeks ago',
     thumbnail: '/thumbnails/luffy.jpg',
-    videoUrl: findS3Url('The Life Luffy Saved', 13),
+    videoUrl: findS3Url('143 - Luffy In Skypia'),
     isFeatured: true,
     category: 'Adventure',
   },
@@ -137,7 +142,7 @@ export const FEATURED_ANIME_VIDEOS = [
     views: '2.1M',
     timestamp: '1 month ago',
     thumbnail: '/thumbnails/jinwoo.jpg',
-    videoUrl: findS3Url('The King Thomas Andre', 8),
+    videoUrl: findS3Url('173 - Solo Leveling Badass Moment'),
     isFeatured: true,
     category: 'Action',
   },
@@ -151,7 +156,7 @@ export const RECENT_ANIME_VIDEOS = [
     views: '620K',
     timestamp: '1 month ago',
     thumbnail: '/thumbnails/tunnel_summer.jpg',
-    videoUrl: findS3Url('The Tunnel To Summer', 35),
+    videoUrl: findS3Url('123. - The Tunnel To Summer'),
     category: 'Sci-Fi',
   },
   {
@@ -161,7 +166,7 @@ export const RECENT_ANIME_VIDEOS = [
     views: '448K',
     timestamp: '3 weeks ago',
     thumbnail: '/thumbnails/cyberpunk.jpg',
-    videoUrl: findS3Url('Somebody Watching Me Edit', 28),
+    videoUrl: findS3Url('117 - Somebody Watching Me Edit'),
     category: 'Thriller',
   },
   {
@@ -171,7 +176,7 @@ export const RECENT_ANIME_VIDEOS = [
     views: '2.3M',
     timestamp: '1 month ago',
     thumbnail: '/thumbnails/eren_aot.jpg',
-    videoUrl: findS3Url('Attack On Titan', 24),
+    videoUrl: findS3Url('142 - Attack On Titan Fight Edit'),
     category: 'Action',
   },
   {
@@ -181,7 +186,7 @@ export const RECENT_ANIME_VIDEOS = [
     views: '1.4M',
     timestamp: '1 month ago',
     thumbnail: '/thumbnails/bluelock.jpg',
-    videoUrl: findS3Url('Blue Lock Aura', 31),
+    videoUrl: findS3Url('12 - Blue Lock Aura'),
     category: 'Action',
   },
 ];

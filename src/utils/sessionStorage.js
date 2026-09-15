@@ -28,6 +28,102 @@ const readStorage = () => {
 const writeStorage = (storage) => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(storage));
 };
+
+export const DEMO_ADMIN_KEY = 'ghsnapflix_demo_admin';
+export const DEMO_SUB_KEY = 'is_demo_subscription';
+
+export const isDemoAdminEnabled = () => {
+    try {
+        return localStorage.getItem(DEMO_ADMIN_KEY) === 'true' || localStorage.getItem(DEMO_SUB_KEY) === 'true';
+    } catch {
+        return false;
+    }
+};
+
+export const setDemoAdminEnabled = (enabled) => {
+    try {
+        if (enabled) {
+            localStorage.setItem(DEMO_ADMIN_KEY, 'true');
+        } else {
+            localStorage.removeItem(DEMO_ADMIN_KEY);
+            localStorage.removeItem(DEMO_SUB_KEY);
+        }
+    } catch (e) {
+        console.error('Error toggling demo admin:', e);
+    }
+};
+
+export const setDemoSubscriptionState = (state) => {
+    try {
+        const demoMsisdn = '233241234567';
+        localStorage.setItem(DEMO_ADMIN_KEY, 'true');
+
+        if (state === 'active') {
+            localStorage.setItem(DEMO_SUB_KEY, 'true');
+            localStorage.setItem(TOKEN_KEY, 'demo-admin-jwt-token');
+            localStorage.setItem(PAYMENT_DONE_KEY, 'true');
+            localStorage.setItem(PHONE_KEY, demoMsisdn);
+            localStorage.setItem(OFFER_CODE_KEY, 'GH_SNAP_DAILY_1');
+
+            const storage = readStorage();
+            const subscribedAt = Date.now();
+            const subscription = {
+                planKey: 'daily',
+                apiPlanId: 'daily-pass',
+                subscribedAt,
+                expiresAt: subscribedAt + 7 * DAY_MS,
+            };
+            storage.subscriptionsByMsisdn[demoMsisdn] = subscription;
+            storage.session = {
+                msisdn: demoMsisdn,
+                isLoggedIn: true,
+                subscription,
+            };
+            writeStorage(storage);
+            return subscription;
+        } else if (state === 'expired') {
+            localStorage.setItem(DEMO_SUB_KEY, 'expired');
+            localStorage.setItem(TOKEN_KEY, 'demo-expired-token');
+            localStorage.setItem(PAYMENT_DONE_KEY, 'false');
+            localStorage.setItem(PHONE_KEY, demoMsisdn);
+
+            const storage = readStorage();
+            const subscribedAt = Date.now() - 2 * DAY_MS;
+            const subscription = {
+                planKey: 'daily',
+                apiPlanId: 'daily-pass',
+                subscribedAt,
+                expiresAt: Date.now() - 3600000, // expired 1 hour ago
+            };
+            storage.subscriptionsByMsisdn[demoMsisdn] = subscription;
+            storage.session = {
+                msisdn: demoMsisdn,
+                isLoggedIn: true,
+                subscription,
+            };
+            writeStorage(storage);
+            return subscription;
+        } else {
+            // guest
+            localStorage.removeItem(DEMO_SUB_KEY);
+            localStorage.removeItem(TOKEN_KEY);
+            localStorage.removeItem(PAYMENT_DONE_KEY);
+            localStorage.removeItem(PHONE_KEY);
+            const storage = readStorage();
+            if (storage.session) {
+                storage.session.isLoggedIn = false;
+                storage.session.subscription = null;
+            }
+            delete storage.subscriptionsByMsisdn[demoMsisdn];
+            writeStorage(storage);
+            return null;
+        }
+    } catch (e) {
+        console.error('Error setting demo subscription state:', e);
+        return null;
+    }
+};
+
 export const isSubscriptionActive = (subscription) => {
     if (!subscription) {
         return false;
@@ -36,6 +132,40 @@ export const isSubscriptionActive = (subscription) => {
 };
 export const getSubscriptionExpiry = (durationDays = 1, fromTime = Date.now()) => fromTime + (durationDays || 1) * DAY_MS;
 export const loadAppSession = () => {
+    // Check Demo Admin state first
+    if (isDemoAdminEnabled()) {
+        const demoSubStatus = localStorage.getItem(DEMO_SUB_KEY);
+        if (demoSubStatus === 'true') {
+            const demoMsisdn = localStorage.getItem(PHONE_KEY) || '233241234567';
+            return {
+                msisdn: demoMsisdn,
+                isLoggedIn: true,
+                isSubscribed: true,
+                subscription: {
+                    planKey: 'daily',
+                    apiPlanId: 'daily-pass',
+                    subscribedAt: Date.now() - 3600000,
+                    expiresAt: Date.now() + 7 * DAY_MS,
+                },
+                accessExpired: false,
+            };
+        } else if (demoSubStatus === 'expired') {
+            const demoMsisdn = localStorage.getItem(PHONE_KEY) || '233241234567';
+            return {
+                msisdn: demoMsisdn,
+                isLoggedIn: true,
+                isSubscribed: false,
+                subscription: {
+                    planKey: 'daily',
+                    apiPlanId: 'daily-pass',
+                    subscribedAt: Date.now() - 2 * DAY_MS,
+                    expiresAt: Date.now() - 3600000,
+                },
+                accessExpired: true,
+            };
+        }
+    }
+
     const token = getAuthToken();
     if (token && isJwtExpired(token)) {
         clearLoginSession();
@@ -140,7 +270,7 @@ export const saveSubscription = (msisdn, plan) => {
     writeStorage(storage);
     return subscription;
 };
-export const clearLoginSession = () => {
+export const clearLoginSession = (preserveDemo = false) => {
     const storage = readStorage();
     if (storage.session) {
         storage.session.isLoggedIn = false;
@@ -150,7 +280,9 @@ export const clearLoginSession = () => {
     localStorage.removeItem(PAYMENT_DONE_KEY);
     localStorage.removeItem(OFFER_CODE_KEY);
     localStorage.removeItem(PHONE_KEY);
-    localStorage.removeItem('is_demo_subscription');
+    if (!preserveDemo && !isDemoAdminEnabled()) {
+        localStorage.removeItem('is_demo_subscription');
+    }
 };
 export const clearAllSessionData = () => {
     localStorage.removeItem(STORAGE_KEY);

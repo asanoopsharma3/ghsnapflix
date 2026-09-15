@@ -172,6 +172,7 @@
         font-weight: 800;
         border: 1px solid rgba(0, 0, 0, 0.06);
         cursor: pointer;
+        white-space: nowrap;
         transition: all $transition-fast;
         box-shadow: 0 3px 10px rgba(255, 210, 31, 0.35);
 
@@ -207,6 +208,7 @@
         font-weight: 700;
         border: 1px solid rgba(0, 0, 0, 0.08);
         cursor: pointer;
+        white-space: nowrap;
         transition: all $transition-fast;
         box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
 
@@ -243,10 +245,28 @@
     margin-bottom: 20px;
     gap: 16px;
 
+    @include mobile {
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
     .section-title-wrap {
       display: flex;
       flex-direction: column;
       gap: 3px;
+
+      .results-count-pill {
+        display: inline-flex;
+        align-items: center;
+        padding: 6px 14px;
+        border-radius: $radius-pill;
+        background: #ffffff;
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        font-size: 0.88rem;
+        font-weight: 800;
+        color: #151515;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+      }
 
       .title-row {
         display: flex;
