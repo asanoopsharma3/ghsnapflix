@@ -407,6 +407,11 @@ function AppContent() {
     saveLoginSession(msisdn);
     setIsLoggedIn(true);
 
+    if (!LOCAL_SUBSCRIPTION_ENABLED) {
+      startCgwByNetwork(msisdn, INITIAL_OFFER_CODE);
+      return;
+    }
+
     try {
       await startCgwForMsisdn(msisdn);
     } catch {
@@ -417,6 +422,7 @@ function AppContent() {
       });
     }
   }, [startCgwForMsisdn]);
+
 
   const handleNotify = useCallback((message, type) => {
     setNotification({ message, type });
