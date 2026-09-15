@@ -48,29 +48,14 @@ import {
   saveAuthToken,
   saveLoginSession,
   saveSubscription,
-  isDemoAdminEnabled,
 } from './utils/sessionStorage';
 import { fetchSubscriptionStatus } from './services/subscriptionService';
 import { resolveCgwCallbackNotice } from './utils/cgwStatus';
 import LoadingSpinner from './components/LoadingSpinner';
 import { addToWatchHistory } from './utils/watchHistory';
-import DemoAdminModal from './components/DemoAdmin/DemoAdminModal';
 
 function AppContent() {
-  const [showDemoAdminModal, setShowDemoAdminModal] = useState(() => {
-    try {
-      const p = new URLSearchParams(window.location.search);
-      return (
-        p.get('admin') === '1' ||
-        p.get('admin') === 'true' ||
-        p.get('page') === 'admin' ||
-        p.get('demo') === '1' ||
-        p.get('demo') === 'admin'
-      );
-    } catch {
-      return false;
-    }
-  });
+  
   const [showLoginModal, setShowLoginModal] = useState(() => {
     try {
       const p = new URLSearchParams(window.location.search);
@@ -464,10 +449,6 @@ function AppContent() {
   }, []);
 
   const handleNavigate = useCallback((page) => {
-    if (page === 'admin') {
-      setShowDemoAdminModal(true);
-      return;
-    }
 
     if (page === 'login') {
       setShowLoginModal(true);
@@ -591,24 +572,11 @@ function AppContent() {
         <AnimeFooter
           onNavigate={handleNavigate}
           onOpenLegalModal={(t) => setLegalModalTab(t)}
-          onOpenDemoAdmin={() => setShowDemoAdminModal(true)}
         />
         {legalModalTab && (
           <LegalSupportModal isOpen={!!legalModalTab} initialTab={legalModalTab} onClose={() => setLegalModalTab(null)} />
         )}
-        {showDemoAdminModal && (
-          <DemoAdminModal
-            isOpen={showDemoAdminModal}
-            onClose={() => setShowDemoAdminModal(false)}
-            onSessionUpdated={(updated) => {
-              setIsLoggedIn(updated.isLoggedIn);
-              setIsSubscribed(updated.isSubscribed);
-              setPhoneNumber(updated.msisdn);
-            }}
-            onPlayTestVideo={(v) => setActiveVideo(v)}
-            onNavigate={handleNavigate}
-          />
-        )}
+        
       </div>
     );
   }
@@ -633,7 +601,7 @@ function AppContent() {
       <AnimeFooter
         onNavigate={handleNavigate}
         onOpenLegalModal={(tab) => setLegalModalTab(tab)}
-        onOpenDemoAdmin={() => setShowDemoAdminModal(true)}
+        
       />
       
       {legalModalTab && (
@@ -657,32 +625,9 @@ function AppContent() {
         <VideoPlayerModal video={activeVideo} onClose={handleCloseVideoPlayer} />
       )}
 
-      {showDemoAdminModal && (
-        <DemoAdminModal
-          isOpen={showDemoAdminModal}
-          onClose={() => setShowDemoAdminModal(false)}
-          onSessionUpdated={(updated) => {
-            setIsLoggedIn(updated.isLoggedIn);
-            setIsSubscribed(updated.isSubscribed);
-            setPhoneNumber(updated.msisdn);
-          }}
-          onPlayTestVideo={(v) => setActiveVideo(v)}
-          onNavigate={handleNavigate}
-        />
-      )}
+      
 
-      {isDemoAdminEnabled() && !showDemoAdminModal && (
-        <button
-          type="button"
-          className="demo-admin-floating-badge"
-          onClick={() => setShowDemoAdminModal(true)}
-          title="Demo Admin Portal"
-        >
-          <span className="badge-pulse" />
-          <span>DEMO ADMIN</span>
-        </button>
-      )}
-
+      
       {notification && (
         <Notification
           message={notification.message}

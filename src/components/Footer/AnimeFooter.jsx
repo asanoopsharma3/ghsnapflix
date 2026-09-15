@@ -232,15 +232,7 @@ export default function AnimeFooter({ onNavigate, onOpenLegalModal, onOpenDemoAd
               © 2026 GHSNAPFLIX.buzz • All rights reserved.
             </span>
             <span className="partner-note">MTN Mobile Billing Verified Partner</span>
-            <button
-              type="button"
-              className="footer-demo-admin-pill"
-              onClick={() => onOpenDemoAdmin ? onOpenDemoAdmin() : onNavigate('admin')}
-              title="Open Demo Admin Portal"
-            >
-              <FaGear className="gear-icon" />
-              <span>Demo Admin</span>
-            </button>
+           
           </div>
           <div className="community-tag">
             <span>Made with <span className="heart-span">❤️</span> for Anime Fans in Ghana</span>
