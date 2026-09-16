@@ -15,7 +15,7 @@ export const HE_REDIRECT_URL = APP_CONFIG.cgw.heRedirectUrl;
 /** NHE uses staging or production Portal from CGW_ENV. HE never uses this URL. */
 export const CGW_NHE_PORTAL_URL = String(APP_CONFIG.cgw.nonHeBaseUrl || APP_CONFIG.cgw.nhePortalStaging).replace(/\/+$/, '');
 export const FORCE_HE = isDevelopmentEnv() && APP_CONFIG.cgw.forceHe;
-/** iOS Safari has no Network Information API; HTTP HE Redirect is also unreliable there. */
+/** iPhone / iPad (Safari, Chrome iOS, etc. — all WebKit). Desktop Mac Safari is not this. */
 export const isIOSDevice = () => {
     if (typeof navigator === 'undefined') {
         return false;
@@ -46,11 +46,11 @@ export const isMobileDevice = () => {
     return Boolean(window.matchMedia?.('(max-width: 729px)')?.matches);
 };
 /**
- * HE: Android cellular / mobile data (or Android phone when type is unknown).
- * NHE: WiFi / Ethernet / desktop / all iOS (Safari cannot report wifi vs cellular).
+ * HE: mobile data (Android cellular, or phone when type is unknown — incl. Safari).
+ * NHE: WiFi / Ethernet / desktop. Unchanged for laptop and WiFi.
  */
 export const isMobileNetworkCandidate = () => {
-    if (isIOSDevice() || isWifiOrLanConnection()) {
+    if (isWifiOrLanConnection()) {
         return false;
     }
     const connectionType = getConnectionType();
@@ -63,7 +63,10 @@ export const shouldUseHeFlow = () => {
     if (FORCE_HE) {
         return true;
     }
-    if (isIOSDevice() || isWifiOrLanConnection()) {
+    if (isWifiOrLanConnection()) {
+        return false;
+    }
+    if (!isMobileDevice()) {
         return false;
     }
     return isMobileNetworkCandidate();
@@ -108,11 +111,38 @@ export const getHeRedirectParams = (offerCode = INITIAL_OFFER_CODE) => {
         msisdn: normalizeGhanaMsisdn(rawMsisdn),
     };
 };
+const submitGetForm = (actionUrl, fields) => {
+    if (typeof document === 'undefined') {
+        const params = new URLSearchParams(fields);
+        window.location.assign(`${actionUrl}?${params.toString()}`);
+        return;
+    }
+    const form = document.createElement('form');
+    form.method = 'GET';
+    form.action = actionUrl;
+    form.acceptCharset = 'UTF-8';
+    form.style.display = 'none';
+    Object.entries(fields).forEach(([name, value]) => {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = name;
+        input.value = String(value ?? '');
+        form.appendChild(input);
+    });
+    document.body.appendChild(form);
+    form.submit();
+};
 export const startHeSubscription = (offerCode = INITIAL_OFFER_CODE) => {
     localStorage.setItem('offerCode', offerCode);
-    const params = new URLSearchParams(getHeRedirectParams(offerCode));
-    const heUrl = `${String(HE_REDIRECT_URL).replace(/\/+$/, '')}?${params.toString()}`;
-    window.location.href = heUrl;
+    const fields = getHeRedirectParams(offerCode);
+    const heUrl = String(HE_REDIRECT_URL).replace(/\/+$/, '');
+    // Safari / iOS block window.location to http:// from https://; form GET is a user navigation.
+    if (isIOSDevice()) {
+        submitGetForm(heUrl, fields);
+        return;
+    }
+    const params = new URLSearchParams(fields);
+    window.location.href = `${heUrl}?${params.toString()}`;
 };
 /** HE → IP Redirect. NHE → sitcgw Portal. */
 export const startCgwByNetwork = (msisdn, offerCode = INITIAL_OFFER_CODE) => {
@@ -132,26 +162,7 @@ export const startNheSubscription = (msisdn, offerCode = INITIAL_OFFER_CODE) => 
         redirectUrl: callbackUrl.toString(),
         mobileNumber: normalizeGhanaMsisdn(msisdn),
     };
-    const portalUrl = CGW_NHE_PORTAL_URL;
-    if (typeof document !== 'undefined') {
-        const form = document.createElement('form');
-        form.method = 'GET';
-        form.action = portalUrl;
-        form.acceptCharset = 'UTF-8';
-        form.style.display = 'none';
-        Object.entries(fields).forEach(([name, value]) => {
-            const input = document.createElement('input');
-            input.type = 'hidden';
-            input.name = name;
-            input.value = value;
-            form.appendChild(input);
-        });
-        document.body.appendChild(form);
-        form.submit();
-        return;
-    }
-    const params = new URLSearchParams(fields);
-    window.location.assign(`${portalUrl}?${params.toString()}`);
+    submitGetForm(CGW_NHE_PORTAL_URL, fields);
 };
 export const LOCAL_SUBSCRIPTION_ENABLED = isDevelopmentEnv() && !FORCE_HE && APP_CONFIG.cgw.localSubscription;
 export const activateLocalSubscription = async (msisdn, offerCode = INITIAL_OFFER_CODE) => {
