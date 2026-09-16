@@ -186,6 +186,14 @@ export default function AnimeFooter({ onNavigate, onOpenLegalModal, onOpenDemoAd
                 <button
                   type="button"
                   className="nav-pill"
+                  onClick={() => onNavigate && onNavigate('unsubscribe')}
+                >
+                  <FaArrowRotateLeft className="pill-icon" />
+                  <span>Unsubscribe</span>
+                </button>
+                <button
+                  type="button"
+                  className="nav-pill"
                   onClick={() => onOpenLegalModal && onOpenLegalModal('privacy')}
                 >
                   <FaShieldHalved className="pill-icon" />

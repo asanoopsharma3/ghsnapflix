@@ -254,7 +254,6 @@ export default function LegalSupportModal({ isOpen, initialTab = 'terms', onClos
                     <li><strong>Subscription Plan:</strong> Daily Only.</li>
                     <li>Applicable subscription fees will be charged through your mobile operator or approved payment method.</li>
                     <li>Subscription renewals may occur automatically until cancelled by the user.</li>
-                    <li>Users may unsubscribe at any time through the available unsubscribe mechanisms.</li>
                   </ul>
                 </div>
               </div>

@@ -23,6 +23,7 @@ import DualPromo from './components/DualPromo/DualPromo';
 import ValueProps from './components/ValueProps/ValueProps';
 import AnimeFooter from './components/Footer/AnimeFooter';
 import LegalSupportModal from './components/LegalSupportModal/LegalSupportModal';
+import UnsubscribePage from './components/UnsubscribePage';
 import { FaFire, FaStar } from 'react-icons/fa6';
 import {
   TRENDING_ANIME_VIDEOS,
@@ -73,8 +74,11 @@ function AppContent() {
       if (p === 'admin') {
         return 'home';
       }
-      if (p === 'unsubscribe' || p === 'subscription-management' || p === 'rewards') {
+      if (p === 'subscription-management' || p === 'rewards') {
         return 'subscription';
+      }
+      if (p === 'unsubscribe') {
+        return 'unsubscribe';
       }
       return p || 'home';
     } catch {
@@ -472,7 +476,7 @@ function AppContent() {
       return;
     }
 
-    if (page === 'unsubscribe' || page === 'subscription-management' || page === 'rewards' || (page === 'subscription' && isSubscribed)) {
+    if (page === 'subscription-management' || page === 'rewards' || (page === 'subscription' && isSubscribed)) {
       setCurrentPage('videos');
       window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
@@ -502,6 +506,8 @@ function AppContent() {
             onNavigate={handleNavigate}
           />
         );
+      case 'unsubscribe':
+        return <UnsubscribePage onNavigate={handleNavigate} onLogout={handleLogout} />;
       case 'news':
         return <NewsPage />;
       case 'videos':
@@ -580,7 +586,7 @@ function AppContent() {
           onOpenLegalModal={(t) => setLegalModalTab(t)}
         />
         {legalModalTab && (
-          <LegalSupportModal isOpen={!!legalModalTab} initialTab={legalModalTab} onClose={() => setLegalModalTab(null)} />
+          <LegalSupportModal isOpen={!!legalModalTab} initialTab={legalModalTab} onClose={() => setLegalModalTab(null)} onNavigate={handleNavigate} />
         )}
         
       </div>
@@ -615,6 +621,7 @@ function AppContent() {
           isOpen={!!legalModalTab}
           initialTab={legalModalTab}
           onClose={() => setLegalModalTab(null)}
+          onNavigate={handleNavigate}
         />
       )}
       
