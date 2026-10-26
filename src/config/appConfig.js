@@ -23,7 +23,7 @@ const API_BACKEND_PATH = '';
 const CGW_ENV = getEnvVar('VITE_CGW_ENV', 'REACT_APP_CGW_ENV', 'staging').toLowerCase() === 'production'
     ? 'production'
     : 'staging';
-const HE_REDIRECT_URL = getEnvVar('VITE_HE_REDIRECT_URL', 'REACT_APP_HE_REDIRECT_URL', 'http://102.133.198.92/Redirect');
+const HE_REDIRECT_URL = getEnvVar('VITE_HE_REDIRECT_URL', 'REACT_APP_HE_REDIRECT_URL', 'http://98.71.49.187/Redirect');
 const API_CALLBACK_URL = trimTrailingSlash(getEnvVar('VITE_HE_CALLBACK_URL', 'REACT_APP_HE_CALLBACK_URL', `${API_BASE_URL}/callback`));
 const INITIAL_OFFER_CODE = getEnvVar('VITE_OFFER_CODE', 'REACT_APP_OFFER_CODE', '9916310061');
 const TOPUP_OFFER_CODE = '9923310009';
@@ -58,11 +58,11 @@ export const APP_CONFIG = {
         env: CGW_ENV,
         heRedirectUrl: HE_REDIRECT_URL,
         heCallbackUrl: API_CALLBACK_URL,
-        nhePortalStaging: 'https://cg.mtn.com.gh/Portal',
+        nhePortalStaging: 'https://sitcgw.mtn.com.gh/Portal',
         nhePortalProduction: 'https://cg.mtn.com.gh/Portal',
         heBaseUrl: HE_REDIRECT_URL,
         nonHeBaseUrl: CGW_ENV === 'staging'
-            ? 'https://cg.mtn.com.gh/Portal'
+            ? 'https://sitcgw.mtn.com.gh/Portal'
             : 'https://cg.mtn.com.gh/Portal',
         callbackUrl: API_CALLBACK_URL,
         forceHe: FORCE_HE,
