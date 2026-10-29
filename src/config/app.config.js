@@ -91,12 +91,12 @@ module.exports = {
     heRedirectUrl: HE_REDIRECT_URL,
     heCallbackUrl: API_CALLBACK_URL,
     nhePortalStaging: 'https://sitcgw.mtn.com.gh/Portal',
-    nhePortalProduction: 'https://cg.mtn.com.gh/Portal',
+    nhePortalProduction: 'https://cgnp.mtn.com.gh/Portal',
     heBaseUrl: HE_REDIRECT_URL,
     nonHeBaseUrl:
       CGW_ENV === 'staging'
         ? 'https://sitcgw.mtn.com.gh/Portal'
-        : 'https://cg.mtn.com.gh/Portal',
+        : 'https://cgnp.mtn.com.gh/Portal',
     callbackUrl: API_CALLBACK_URL,
     forceHe: FORCE_HE,
     localSubscription: LOCAL_SUBSCRIPTION,
